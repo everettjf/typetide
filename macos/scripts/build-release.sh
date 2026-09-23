@@ -167,6 +167,8 @@ ln -s /Applications "$DMG_STAGING/Applications"
 hdiutil create -volname "$APP_NAME" -srcfolder "$DMG_STAGING" \
     -ov -format UDZO "$DMG_PATH" || error "DMG creation failed"
 
+codesign --force --sign "$DEVELOPER_ID_APPLICATION" --timestamp "$DMG_PATH" \
+    || error "DMG signing failed"
 success "DMG created at $DMG_PATH"
 
 # 步骤 6: 公证
