@@ -22,12 +22,13 @@ Want to read before you send? Flip on rewrite **preview** in Settings and approv
 
 ## Local-first, or bring your own model
 
-TypeTide is backend-agnostic with two pluggable providers:
+Apple Silicon Macs default to a built-in offline model; three backend options are available:
 
+- **Built-in (Apple Silicon Mac)** — download TranslateGemma 4B once (about 2.22 GB), then translate offline without an account, API key, Ollama, or Python setup. Supports Faithful translation and in-place replacement; selections above the 2K input-token limit need to be shortened.
 - **Ollama (local)** — run a model like `qwen2.5:3b` on your own machine. Nothing leaves your Mac, it works on a plane, and there's no per-token bill. If your configured model isn't installed, TypeTide auto-picks one that is.
 - **OpenAI-compatible (cloud)** — point it at any `/chat/completions` endpoint with a base URL, key, and model name. Great when you want maximum speed or a frontier model.
 
-Both stream their output token by token, so translations appear as they're generated.
+The backends stream their output token by token, so translations appear as they're generated.
 
 ## Works *everywhere* — even where text APIs don't
 
@@ -35,7 +36,7 @@ Most "select to translate" tools break the moment you leave a native text view. 
 
 ## Styles for the tone you need
 
-Translation isn't one-size-fits-all. TypeTide ships four styles you can set independently for reading and rewriting:
+The built-in model supports Faithful translation. Ollama and API backends also support Formal, Casual, and Polished rewriting:
 
 - **Faithful** — a plain, accurate translation.
 - **Formal** — professional tone for work email.
@@ -53,23 +54,17 @@ Select / type  ─►  Shortcut · floating icon · auto
                           │
                  Capture (AX selection ─► clipboard fallback)
                           │
-              Translate (Ollama / OpenAI-compatible, streaming)
+              Translate (built-in MLX / Ollama / OpenAI-compatible, streaming)
                           │
         Read: popup  ·  Write: paste in place (undo-safe)
 ```
 
-Under the hood it's a focused, native Swift app: a `SelectionCapture` layer over the Accessibility API, a `TranslationService` that routes to either provider with caching and style injection, and an undo-safe `TextReplacer`. It's menu-bar only (`LSUIElement`), so there's no Dock clutter — just global shortcuts, launch-at-login, and a per-app skip list for the apps where you don't want it.
+Under the hood it's a focused, native Swift app: a `SelectionCapture` layer over the Accessibility API, a `TranslationService` that routes to the selected provider with caching and style injection, and an undo-safe `TextReplacer`. It's menu-bar only (`LSUIElement`), so there's no Dock clutter — just global shortcuts, launch-at-login, and a per-app skip list for the apps where you don't want it.
 
 ## Get started in three steps
 
-1. **Pick a backend.** For private/offline use:
-   ```bash
-   brew install ollama
-   ollama pull qwen2.5:3b
-   ollama serve
-   ```
-   …or choose *OpenAI-compatible* in **Settings → Backend** and paste your base URL, key, and model.
-2. **Install.** Grab the latest `.dmg` from the [Releases](https://github.com/everettjf/typetide/releases) page and drag it to Applications.
+1. **Install.** Grab the latest `.dmg` from the [Releases](https://github.com/everettjf/typetide/releases) page and drag it to Applications.
+2. **Pick a backend.** On Apple Silicon Macs, keep **Built-in (Offline)** and download the model once. Intel Macs use Ollama or an OpenAI-compatible API.
 3. **Grant Accessibility.** Allow TypeTide under **System Settings → Privacy & Security → Accessibility** (it's what lets the app read selections and replace text). Then select text → <kbd>⌥</kbd><kbd>D</kbd>, or type → <kbd>⌥</kbd><kbd>R</kbd>.
 
 Everything — shortcuts, triggers, styles, languages — is configurable in Settings.
@@ -82,4 +77,4 @@ It's **open source (MIT)**. If it saves you a few context switches a day, a ⭐�
 
 ---
 
-*TypeTide · system-wide AI translation & inline rewrite for macOS 26+. [Website](https://xnu.app/TypeTide/) · [GitHub](https://github.com/everettjf/typetide) · [中文版](introducing-typetide.zh.md)*
+*TypeTide · system-wide AI translation & inline rewrite for macOS 26+. [Website](https://xnu.app/typetide/) · [GitHub](https://github.com/everettjf/typetide) · [中文版](introducing-typetide.zh.md)*

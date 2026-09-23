@@ -36,14 +36,14 @@ TypeTide 用"粘贴"的方式写回结果，所以 App 原生的 **撤销** 依�
 
 ## 二、本地优先，或自带模型
 
-TypeTide 对后端不挑食，内置两种可插拔的 provider：
+Apple Silicon Mac 默认使用内置离线模型，也可以选择其他后端：
 
+- **内置离线模型（Apple Silicon Mac）** —— 下载约 2.22 GB 的 TranslateGemma 4B 后即可离线翻译，无需账号、API Key、Ollama 或 Python。支持忠实翻译与原位替换；超过 2K 输入 token 的长文本需要分段。
 - **Ollama（本地）** —— 在自己机器上跑 `qwen2.5:3b` 这样的模型。数据不出本机，在飞机上也能用，也没有按 token 计费。如果你配置的模型没装，TypeTide 会自动挑一个已装的。
 - **OpenAI 兼容（云端）** —— 指向任意 `/chat/completions` 接口，填好 base URL、key 和模型名即可。想要极致速度或前沿模型时很合适。
 
-两者都是 **逐 token 流式** 输出，所以译文是边生成边出现的。
+各后端都是 **逐 token 流式** 输出，所以译文是边生成边出现的。
 
-![一套 TranslationService 接口，分流到 Ollama 本地与 OpenAI 云端](assets/02-comparison-local-vs-cloud.svg)
 
 ---
 
@@ -59,7 +59,7 @@ TypeTide 对后端不挑食，内置两种可插拔的 provider：
 
 ## 四、四种语气风格
 
-翻译不是一刀切的。TypeTide 提供四种风格，读和写可以分别设置：
+内置模型支持忠实翻译；正式、随意和润色改写需要选择 Ollama 或 API 后端：
 
 | 风格 | 适合场景 |
 |---|---|
@@ -74,22 +74,15 @@ TypeTide 对后端不挑食，内置两种可插拔的 provider：
 
 ## 五、它是怎么工作的
 
-![原生 Swift 管线：触发 → 捕获 → 翻译 → 读/写分支](assets/04-flowchart-architecture.svg)
 
-底层是一个专注的原生 Swift App：一层架在辅助功能 API 上的 `SelectionCapture`，一个带缓存和风格注入、能路由到两种 provider 的 `TranslationService`，以及一个可撤销的 `TextReplacer`。它是纯菜单栏应用（`LSUIElement`），所以 Dock 里没有图标——只有全局快捷键、开机自启，以及一个"跳过 App"名单，让你在不想用它的应用里关掉它。
+底层是一个专注的原生 Swift App：一层架在辅助功能 API 上的 `SelectionCapture`，一个带缓存和风格注入、能路由到所选后端 的 `TranslationService`，以及一个可撤销的 `TextReplacer`。它是纯菜单栏应用（`LSUIElement`），所以 Dock 里没有图标——只有全局快捷键、开机自启，以及一个"跳过 App"名单，让你在不想用它的应用里关掉它。
 
 ---
 
 ## 六、三步上手
 
-1. **选后端。** 想要私密 / 离线：
-   ```bash
-   brew install ollama
-   ollama pull qwen2.5:3b
-   ollama serve
-   ```
-   ……或在 **设置 → 后端** 选 *OpenAI 兼容*，粘贴你的 base URL、key 和模型名。
-2. **安装。** 从 [Releases](https://github.com/everettjf/typetide/releases) 下载最新的 `.dmg`，拖进 Applications。
+1. **安装。** 从 [Releases](https://github.com/everettjf/typetide/releases) 下载最新的 `.dmg`，拖进 Applications。
+2. **选后端。** Apple Silicon Mac 保留 **Built-in (Offline)** 并下载模型；Intel Mac 使用 Ollama 或自己的 OpenAI 兼容接口。
 3. **授予辅助功能权限。** 在 **系统设置 → 隐私与安全性 → 辅助功能** 里允许 TypeTide（这是它能读取选区、替换文字的前提）。然后：选中文字 → <kbd>⌥</kbd><kbd>D</kbd>，或打字 → <kbd>⌥</kbd><kbd>R</kbd>。
 
 快捷键、触发方式、风格、语言——全都可以在设置里调。
@@ -104,4 +97,4 @@ TypeTide 对后端不挑食，内置两种可插拔的 provider：
 
 ---
 
-*TypeTide · 面向 macOS 26+ 的系统级 AI 翻译与就地改写。[官网](https://xnu.app/TypeTide/) · [GitHub](https://github.com/everettjf/typetide) · [English version](introducing-typetide.md)*
+*TypeTide · 面向 macOS 26+ 的系统级 AI 翻译与就地改写。[官网](https://xnu.app/typetide/) · [GitHub](https://github.com/everettjf/typetide) · [English version](introducing-typetide.md)*

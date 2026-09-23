@@ -4,11 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>TypeTide — System-wide AI translation &amp; inline rewrite</title>
-<meta name="description" content="Type in your language. Read and rewrite in any app on macOS and Windows, powered by local Ollama or your own cloud AI endpoint." />
-<link rel="canonical" href="https://xnu.app/TypeTide/" />
+<meta name="description" content="Type in your language. Read and rewrite in any app on macOS and Windows, with built-in offline translation on Apple Silicon Macs, or Ollama and your own API on Mac and Windows." />
+<link rel="canonical" href="https://xnu.app/typetide/" />
 <meta property="og:title" content="TypeTide — Type in your language. Read and rewrite anywhere." />
-<meta property="og:url" content="https://xnu.app/TypeTide/" />
-<meta property="og:description" content="System-wide AI translation and inline rewrite for macOS and Windows. Local or cloud, native on both platforms." />
+<meta property="og:url" content="https://xnu.app/typetide/" />
+<meta property="og:description" content="Translate in place on Mac and Windows. Apple Silicon Macs can download a built-in offline model without an API key." />
 <meta property="og:type" content="website" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23d23a1d'/><text x='50' y='72' font-size='62' font-family='Georgia,serif' fill='%23f5f0e6' text-anchor='middle'>T</text></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -140,7 +140,7 @@
   .language-pill small{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:7px;text-transform:uppercase}
 
   /* backends */
-  .be-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:46px}
+  .be-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:46px}
   .be{background:var(--card);border:1px solid var(--line-2);border-radius:16px;padding:30px;box-shadow:6px 6px 0 rgba(28,24,20,.06)}
   .be .tag{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
   .be h4{font-family:var(--display);font-size:24px;font-weight:600;margin:8px 0 10px}
@@ -208,17 +208,18 @@
       <svg class="underx" viewBox="0 0 440 13" fill="none" preserveAspectRatio="none"><path d="M3 8C84 3 210 2 437 6" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
       <em>Rewrite</em> in place.
     </h1>
-    <p class="sub">TypeTide lives in your menu bar or system tray. <b>Select</b> foreign text to translate it beside the selection, or <b>type</b> in your language and have it <b>rewritten in place</b> — in any app.</p>
+    <p class="sub">Write a message in your own language and <b>translate it in the same input field</b>. Select incoming text to read its translation beside it. On Apple Silicon Macs, download the built-in model once — <b>no API key or Ollama needed</b>.</p>
 
     <div class="actions">
       <div class="cmd" id="brew">
         <span><b>macOS</b> · <span class="pr">$</span> brew install --cask everettjf/tap/typetide</span>
         <button onclick="copyBrew()" id="copybtn">Copy</button>
       </div>
-      <a class="btn solid" href="https://github.com/everettjf/typetide/releases/latest" target="_blank" rel="noopener noreferrer">Download for macOS</a>
-      <a class="btn line" href="https://github.com/everettjf/typetide/releases/latest" target="_blank" rel="noopener noreferrer">Download for Windows</a>
+      <a class="btn solid" href="https://github.com/everettjf/typetide/releases/download/v0.1.15/TypeTide-0.1.15.dmg" target="_blank" rel="noopener noreferrer">Download for macOS</a>
+      <a class="btn line" href="https://github.com/everettjf/typetide/releases/download/v0.1.14/TypeTide-Setup-0.1.14.exe" target="_blank" rel="noopener noreferrer">Download for Windows</a>
     </div>
-    <p class="meta"><b>macOS 26+</b> · <b>Windows 10+</b> · Apple Silicon, Intel &amp; x64 · native · <b>MIT</b></p>
+    <p class="meta"><b>macOS 26+</b> · Mac download: 0.1.15 · <b>Windows 10+ x64</b> · Windows download: 0.1.14 · <b>Free &amp; open source</b></p>
+    <p class="meta">Built-in offline model: Apple Silicon only, about 2.22 GB to download. Intel Macs and Windows use Ollama or an API. <a href="https://github.com/everettjf/typetide/releases">All releases and portable Windows ZIPs ↗</a></p>
   </header>
 
   <div class="hero-fig plate reveal">
@@ -267,11 +268,11 @@
     <div class="sec-head reveal"><span class="sec-no">§ THE FINE PRINT</span><h2>Everything you'd want.<br>Nothing you don't.</h2></div>
 
     <div class="spec">
-      <div class="row reveal"><div class="ix">01</div><div><h4>Works in every app</h4><p>Reads your selection through macOS Accessibility or Windows UI Automation, with a synthetic-copy fallback for Electron &amp; web apps — and your clipboard is always restored afterward.</p></div></div>
-      <div class="row reveal"><div class="ix">02</div><div><h4>Privacy you can reason about</h4><p>Ollama keeps triggered selections on your machine. A cloud backend sends them to the endpoint you configure. Accessibility/UI Automation enables system-wide selection access; clipboard fallback briefly copies and then restores your clipboard, which clipboard-history tools may record.</p></div></div>
+      <div class="row reveal"><div class="ix">01</div><div><h4>Works across your apps</h4><p>Reads your selection through macOS Accessibility or Windows UI Automation, with a synthetic-copy fallback for Electron &amp; web apps — then restores the previous clipboard. Protected fields and apps that block selection or paste may not work.</p></div></div>
+      <div class="row reveal"><div class="ix">02</div><div><h4>Privacy you can reason about</h4><p>The built-in model and local Ollama keep triggered selections on your machine. The built-in model needs a one-time download before offline use. A cloud backend sends them to the endpoint you configure. Accessibility/UI Automation enables system-wide selection access; clipboard fallback briefly copies and then restores your clipboard, which clipboard-history tools may record.</p></div></div>
       <div class="row reveal"><div class="ix">03</div><div><h4>Undo-safe rewrite</h4><p>Rewrites are pasted in place and preserve each app's native undo stack. Changed your mind? Use <code>⌘Z</code> or <code>Ctrl+Z</code>.</p></div></div>
       <div class="row reveal"><div class="ix">04</div><div><h4>Shortcuts that fit your workflow</h4><p>Set smart or fixed language direction independently for Read and Write. Change either shortcut, clear one completely, or trigger Read from the floating icon and automatic selection mode.</p></div></div>
-      <div class="row reveal"><div class="ix">05</div><div><h4>Four tones</h4><p><b>Faithful</b>, <b>Formal</b>, <b>Casual</b>, or <b>Polished</b> — chosen independently for reading and rewriting, across the ten most-spoken languages.</p></div></div>
+      <div class="row reveal"><div class="ix">05</div><div><h4>Translate faithfully, or choose a writing style</h4><p>The built-in model supports <b>Faithful</b> translation and in-place replacement. For <b>Formal</b>, <b>Casual</b>, or <b>Polished</b> rewriting, choose Ollama or an API backend.</p></div></div>
       <div class="row reveal"><div class="ix">06</div><div><h4>Native on both platforms</h4><p>A SwiftUI menu-bar app on macOS and a Win32 tray app on Windows. No Electron runtime, with launch at login and a per-app skip list.</p></div></div>
     </div>
   </div>
@@ -303,14 +304,20 @@
 <section id="backends">
   <div class="wrap">
     <div class="sec-head reveal"><span class="sec-no">§ YOUR MODEL</span><h2>Local or cloud.</h2></div>
-    <p class="sec-lead reveal">Backend-agnostic with two pluggable providers — both streaming, token by token.</p>
+    <p class="sec-lead reveal">Start with the built-in offline model on Apple Silicon. Choose Ollama or an API on either platform when you need another model or writing style.</p>
 
     <div class="be-grid">
       <div class="be reveal">
-        <span class="tag">On-device</span>
+        <span class="tag">Apple Silicon Mac · default</span>
+        <h4>Built-in offline model</h4>
+        <p>Download TranslateGemma 4B once (about 2.22 GB), then translate on your Mac. No account, API key, Ollama, or Python setup. Download progress, cancellation, retry, and integrity checks are built in.</p>
+        <p>Faithful translation and in-place replacement. Long selections above the model’s 2K input-token limit need to be shortened.</p>
+      </div>
+      <div class="be reveal">
+        <span class="tag">Mac + Windows · local</span>
         <h4>Ollama</h4>
         <p>Offline and private. Install a model and go — TypeTide auto-picks an installed one if your configured model isn't there.</p>
-        <pre><span class="pr">$</span> ollama pull qwen2.5:3b</pre>
+        <pre><span class="pr">$</span> ollama pull qwen3.5:4b</pre>
       </div>
       <div class="be reveal">
         <span class="tag">Bring your own</span>
@@ -325,11 +332,11 @@
 <div class="wrap">
   <div class="band reveal">
     <h2>Type here. Translate here.</h2>
-    <p>Free, open source, and native on macOS and Windows. Set up in under two minutes.</p>
+    <p>Free and open source. Install, complete the permission and backend checks, then try your first translation. Initial model download time depends on your connection.</p>
     <p class="meta"><b>macOS</b> · signed &amp; notarized DMG or Homebrew &nbsp;·&nbsp; <b>Windows</b> · per-user installer or portable ZIP</p>
     <div class="actions">
-      <a class="btn solid" href="https://github.com/everettjf/typetide/releases/latest" target="_blank" rel="noopener noreferrer">Download for macOS</a>
-      <a class="btn line" href="https://github.com/everettjf/typetide/releases/latest" target="_blank" rel="noopener noreferrer">Download for Windows</a>
+      <a class="btn solid" href="https://github.com/everettjf/typetide/releases/download/v0.1.15/TypeTide-0.1.15.dmg" target="_blank" rel="noopener noreferrer">Download for macOS</a>
+      <a class="btn line" href="https://github.com/everettjf/typetide/releases/download/v0.1.14/TypeTide-Setup-0.1.14.exe" target="_blank" rel="noopener noreferrer">Download for Windows</a>
       <a class="btn line" href="https://github.com/everettjf/typetide">★ Star on GitHub</a>
     </div>
   </div>
@@ -340,6 +347,7 @@
       <a href="https://github.com/everettjf/typetide">GitHub</a>
       <a href="https://github.com/everettjf/typetide/blob/main/docs/blog/introducing-typetide.md">Blog</a>
       <a href="https://discord.gg/eGzEaP6TzR">Discord</a>
+      <a href="https://xnu.app/">By Everett</a>
       <a href="https://github.com/everettjf/typetide/blob/main/LICENSE">MIT License</a>
     </div>
   </footer>

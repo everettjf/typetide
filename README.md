@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://xnu.app/TypeTide/">🌐 Website</a> ·
+  <a href="https://xnu.app/typetide/">🌐 Website</a> ·
   <a href="docs/blog/introducing-typetide.md">📝 Read the intro</a> ·
   <b>English</b> · <a href="README.zh-CN.md">简体中文</a>
 </p>
@@ -54,7 +54,7 @@ No browser tab and no copy-paste loop. On Apple Silicon Macs, translation defaul
 - **Undo-safe replacement** — replacements are pasted, preserving each app’s native undo stack.
 - **Local or cloud** — pluggable backends: **Built-in MLX** (Apple Silicon Mac), **Ollama** (offline, private), or any **OpenAI-compatible** API (`/chat/completions`, streaming). Switch in Settings.
 - **Model picker** — Settings lists your installed Ollama models, recommends a comfortable size from physical memory, and auto-selects an installed model when the configured one is missing. Thinking models (qwen3 family, …) are handled — hidden reasoning is disabled so translations stay instant.
-- **Styles** — Faithful, Formal, Casual, or Polished, independently for read and rewrite.
+- **Styles** — the built-in model supports Faithful translation. Formal, Casual, and Polished rewriting require Ollama or an API backend.
 - **Shortcut actions** — each of the two global shortcuts can independently use smart direction or a fixed native/foreign target, then show a popup or replace in place.
 - **Built-in checks** — first-run setup verifies permissions, backend translation, and shortcut registration. The backend check uses fixed synthetic text, never the clipboard.
 - **Private diagnostics** — optional operational events stay on the device and can be reviewed, exported, or cleared. They contain timing, outcome, backend, and capture method only—never selected text, translations, clipboard contents, app names, URLs, or credentials.
@@ -67,7 +67,7 @@ No browser tab and no copy-paste loop. On Apple Silicon Macs, translation defaul
 |---|---|---|---|
 | Works in any app (mail, chat, IDE, terminal) | ✅ | ❌ (paste in/out) | ⚠️ menu only |
 | Rewrite **in place** for replies | ✅ | ❌ | ❌ |
-| Runs 100% offline / private | ✅ (Ollama) | ❌ | ⚠️ |
+| Runs 100% offline / private | ✅ (built-in model or local Ollama) | ❌ | ⚠️ |
 | Bring your own model / endpoint | ✅ | ❌ | ❌ |
 | Streaming output | ✅ | ⚠️ | ❌ |
 
@@ -79,7 +79,17 @@ Pick your native and foreign language in **Settings → Language**. Each Read/Wr
 
 ## 🚀 Quick start
 
-**1. Pick a backend**
+**1. Install TypeTide**
+
+macOS — with [Homebrew](https://brew.sh) (recommended):
+```bash
+brew install --cask everettjf/tap/typetide
+```
+…or download the latest `.dmg` from [Downloads](https://xnu.app/typetide/#top), drag it to Applications, and launch it. The build is Developer ID signed and notarized by Apple.
+
+Windows — download and run the latest `TypeTide-Setup-x.y.z.exe` installer from [Downloads](https://xnu.app/typetide/#top) (per-user, no admin needed; a portable `TypeTide-Windows-x.y.z.zip` is also available). If SmartScreen warns about an unrecognized app, choose **More info → Run anyway**.
+
+**2. Pick a backend**
 
 **macOS (Apple Silicon):** keep the default **Built-in (Offline)** backend and click **Download Model** in first-run setup or **Settings → Backend**. The pinned TranslateGemma 4B 4-bit model downloads about 2.22 GB from Hugging Face; selected text never leaves the Mac. No Ollama, Python, account, or API key is needed. Model memory is released after two idle minutes. This backend supports Faithful translation and in-place replacement; other writing styles require Ollama/API. Long selections over the model's 2K input-token limit produce an actionable error instead of being silently truncated. Model use is subject to the [Gemma terms](https://ai.google.dev/gemma/terms).
 
@@ -94,16 +104,6 @@ OpenAI, OpenRouter, and DeepSeek plus a custom OpenAI-compatible endpoint; API k
 kept in Windows Credential Manager rather than the settings JSON.
 
 TypeTide lists your installed models in **Settings → Backend** and auto-picks an installed one if the configured model is missing — pulling *any* chat model is enough to get going.
-
-**2. Install TypeTide**
-
-macOS — with [Homebrew](https://brew.sh) (recommended):
-```bash
-brew install --cask everettjf/tap/typetide
-```
-…or download the latest `.dmg` from [Releases](https://github.com/everettjf/typetide/releases/latest), drag it to Applications, and launch it. The build is signed and notarized by Apple.
-
-Windows — download and run the latest `TypeTide-Setup-x.y.z.exe` installer from [Releases](https://github.com/everettjf/typetide/releases/latest) (per-user, no admin needed; a portable `TypeTide-Windows-x.y.z.zip` is also available). If SmartScreen warns about an unrecognized app, choose **More info → Run anyway**.
 
 **3. First run**
 
@@ -130,7 +130,7 @@ Select / type  ─►  Shortcut · floating icon · auto
                           │
       Capture (AX / UI Automation selection ─► clipboard fallback)
                           │
-              Translate (Ollama / OpenAI-compatible, streaming)
+              Translate (built-in MLX / Ollama / OpenAI-compatible, streaming)
                           │
         Read: popup  ·  Write: paste in place (undo-safe)
 ```
@@ -139,6 +139,7 @@ Select / type  ─►  Shortcut · floating icon · auto
 
 TypeTide can read and replace selected text across applications, so macOS requires Accessibility permission; Windows uses UI Automation without a separate permission prompt. Capture happens only after a configured shortcut, floating-icon click, or auto-translate selection event. Apps containing sensitive text can be disabled in **Settings → Excluded apps**; use **shortcut only** mode when you do not want passive selection monitoring.
 
+- With **Built-in (Offline)** on Apple Silicon, selected text is processed on the Mac. Download the model once before offline use.
 - With **Ollama**, captured text is sent only to the Ollama service on `127.0.0.1`. TypeTide has no hosted relay or telemetry service.
 - With an **OpenAI-compatible backend**, captured text is sent to the configured base URL when translation is triggered. That provider's retention and privacy policy applies; do not use a cloud backend for secrets or sensitive text.
 - Some apps do not expose their selection through accessibility APIs. TypeTide then briefly copies the selection, reads it, and restores the previous clipboard contents. Clipboard managers may still record that temporary copy.

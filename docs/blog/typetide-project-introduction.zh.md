@@ -13,7 +13,7 @@ tags:
 
 > **Type in your language. Rewrite in place.** 选中一段外文，一个快捷键就地读懂；用母语输入，一次按键直接改写成目标语言。TypeTide 不要求你离开正在使用的应用，也可以让模型完全运行在自己的电脑上。
 
-![TypeTide 图标](assets/typetide-icon.png)
+![TypeTide 图标](../branding/typetide-icon-master.png)
 
 我们每天都在支付一笔不起眼的“翻译税”：复制文字、切换应用、粘贴到翻译工具、复制结果，再切回原来的窗口。真正打断工作的往往不是翻译本身，而是这一连串上下文切换。
 
@@ -34,7 +34,7 @@ TypeTide 想删掉的正是这个流程。它是一款开源、原生、双平�
 
 TypeTide 会在选区附近打开浮窗，流式显示译文。结果可以复制，也可以直接替换原文。除了快捷键，还可以启用选区旁的浮动图标或划词自动翻译。
 
-![选中文字后流式显示译文](assets/translate.gif)
+![选中文字后流式显示译文](../screenshots/translate.gif)
 
 ### 写：用母语输入，原地改成目标语言
 
@@ -45,7 +45,7 @@ TypeTide 会在选区附近打开浮窗，流式显示译文。结果可以复�
 
 原文会在当前输入框中直接变成目标语言，不需要把结果从另一个窗口搬回来。
 
-![在当前输入框中原地改写](assets/rewrite.gif)
+![在当前输入框中原地改写](../screenshots/rewrite.gif)
 
 替换通过系统粘贴完成，因此仍然保留应用原生的撤销能力：macOS 使用 `⌘ Z`，Windows 使用 `Ctrl + Z`。如果不希望立即替换，也可以先在浮窗里预览。
 
@@ -59,14 +59,14 @@ TypeTide 会在选区附近打开浮窗，流式显示译文。结果可以复�
 
 ## 本地优先，但不限制模型选择
 
-TypeTide 支持两类后端：
+TypeTide 支持三类后端；Apple Silicon Mac 默认使用内置离线模型：
 
 | 后端 | 适合场景 | 数据去向 |
 |---|---|---|
+| 内置 MLX 模型（Apple Silicon） | 下载约 2.22 GB 后离线翻译，无需 Key 或 Ollama | 本机 |
 | Ollama | 隐私内容、离线使用、零按量费用 | 本机 `127.0.0.1` |
 | OpenAI 兼容接口 | 更快的云模型或自建服务 | 用户配置的服务地址 |
 
-![同一套翻译服务可连接本地或云端模型](assets/02-comparison-local-vs-cloud.svg)
 
 Ollama 是一等公民，而不是附带选项。TypeTide 会列出本机已安装模型、根据机器内存给出建议，并在原配置模型不存在时选择可用模型。对于 qwen3 等思考型模型，还会关闭不必要的隐藏推理，避免一次简单翻译等待很久。
 
@@ -87,7 +87,6 @@ macOS 需要用户授予辅助功能权限；Windows 不需要额外的系统权
 
 ## 双端原生，而不是套一层网页
 
-![TypeTide 的核心处理管线](assets/04-flowchart-architecture.svg)
 
 两端共享相同的产品逻辑，但遵循各自平台习惯：
 
@@ -98,7 +97,7 @@ macOS 需要用户授予辅助功能权限；Windows 不需要额外的系统权
 | 取词接口 | Accessibility | UI Automation |
 | 网络接口 | URLSession | WinHTTP |
 | 开机启动 | SMAppService | HKCU Run |
-| 第三方运行时 | 无 | 无 |
+| 模型运行 | 内置 MLX（Apple Silicon）；可选 Ollama/API | Ollama/API |
 
 核心链路保持一致：触发 → 捕获选区 → 路由模型 → 流式翻译 → 弹窗显示或原地替换。Windows 端特别保证主消息循环不会被网络和剪贴板操作阻塞；macOS 端则对辅助功能授权、快捷键注册和选区捕获做了分层处理。
 
@@ -129,7 +128,7 @@ macOS 和 Windows 使用完全相同的十种检测与翻译语言：
 - Português（葡萄牙语，`pt`）
 - Bahasa Indonesia（印尼语，`id`）
 
-读和写可以分别选择四种风格：
+内置模型支持忠实翻译与原位替换；正式、随意和润色需要 Ollama 或 API。可选风格为：
 
 - 忠实：尽量准确保留原意
 - 正式：适合工作邮件和专业沟通
@@ -140,8 +139,8 @@ macOS 和 Windows 使用完全相同的十种检测与翻译语言：
 
 ## 三步开始使用
 
-1. **选择后端。** 隐私与离线优先时安装 [Ollama](https://ollama.com/download)，例如运行 `ollama pull qwen2.5:3b`；也可以填写自己的云端兼容接口。
-2. **安装应用。** 从 [GitHub Releases](https://github.com/everettjf/typetide/releases/latest) 下载 macOS DMG、Windows 安装版 EXE 或便携版 ZIP。macOS 用户也可运行 `brew install --cask everettjf/tap/typetide`。
+1. **安装应用。** 从 [官方下载页](https://xnu.app/typetide/#top) 下载 macOS DMG、Windows 安装版 EXE 或便携版 ZIP。macOS 用户也可运行 `brew install --cask everettjf/tap/typetide`。
+2. **选择后端。** Apple Silicon Mac 使用默认的 **Built-in (Offline)**，下载约 2.22 GB 模型后即可离线使用，无需 Key 或 Ollama。内置模型的 2K 输入 token 限制意味着长文本需要分段。Intel Mac 和 Windows 使用 Ollama 或自己的 API。
 3. **完成首次检查。** macOS 授予辅助功能权限，Windows 无需额外系统权限；然后在设置中测试后端并验证已配置的快捷键。选中文字按“读”，输入文字按“写”。
 
 目前系统要求为 macOS 26+ 或 Windows 10+。macOS 安装包经过 Developer ID 签名与 Apple 公证；Windows 提供无需管理员权限的按用户安装包和便携版。

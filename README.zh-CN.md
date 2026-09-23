@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://xnu.app/TypeTide/">🌐 官网</a> ·
+  <a href="https://xnu.app/typetide/">🌐 官网</a> ·
   <a href="docs/blog/typetide-project-introduction.zh.md">📝 项目介绍</a> ·
   <a href="README.md">English</a> · <b>简体中文</b>
 </p>
@@ -22,7 +22,7 @@ TypeTide 把翻译变成一个原地完成的系统动作。它常驻菜单栏�
 - **读** — 选中外语文字，按下快捷键，译文就在旁边弹出。
 - **写** — **用母语输入**，按下快捷键，文字原地改写成目标语言，直接可以发送。
 
-不用打开浏览器标签页，也不用在翻译网站之间来回复制粘贴。翻译可以使用本地模型 **Ollama**（隐私、离线），也可以使用你选择的云端接口（更快）。
+不用打开浏览器标签页，也不用在翻译网站之间来回复制粘贴。Apple Silicon Mac 默认使用**内置离线模型**，下载一次即可使用，无需 Ollama 或 API Key。也可以选择 **Ollama** 或自己的 API；Intel Mac 和 Windows 使用后两种方式。
 
 <p align="center">
   <img src="docs/screenshots/rewrite.gif" alt="输入中文，按下改写快捷键，原地改写为英文" width="760" />
@@ -47,9 +47,9 @@ TypeTide 把翻译变成一个原地完成的系统动作。它常驻菜单栏�
 - **写 · 原地改写** — 用母语写字，按改写快捷键，输入框内容被替换成译文。可直接替换，也可先预览。
 - **每个应用都能用** — 通过 Accessibility API（macOS）/ UI Automation（Windows）读取选区，对 Electron/网页类应用自动降级为剪贴板复制，文字接口不可用时也能工作。原剪贴板内容总会被还原。
 - **替换不破坏撤销** — 替换通过粘贴完成，保留每个应用原生的撤销栈（Ctrl+Z / ⌘Z 随时可撤销）。
-- **本地或云端** — 可插拔后端：**Ollama**（离线、私密）或任意 **OpenAI 兼容** API（`/chat/completions`，流式）。设置里一键切换。
+- **本地或云端** — 可插拔后端：**内置 MLX 模型**（Apple Silicon Mac）、**Ollama**（离线、私密）或任意 **OpenAI 兼容** API（`/chat/completions`，流式）。设置里一键切换。
 - **模型选择** — 设置里列出已安装的 Ollama 模型，根据机器内存推荐合适尺寸；配置模型没装时自动换成已安装模型。思考型模型（qwen3 系等）会自动关闭隐藏推理，翻译保持秒回。
-- **风格** — 忠实直译、正式、口语、润色四种，读和写可分别设置。
+- **风格** — 内置模型支持忠实翻译与原位替换；正式、口语和润色改写需要 Ollama 或 API 后端。
 - **快捷键动作可组合** — 两个全局快捷键都能独立选择智能方向或固定母语/外语目标，并决定弹窗展示或原地替换。
 - **内置可用性检查** — 首次设置会检查权限、后端翻译和快捷键注册；后端测试只发送固定合成文本，不读取剪贴板。
 - **本地隐私诊断** — 运行结果、耗时、后端和取词方式只保存在本机，可查看、导出或清空；不会记录选中文字、译文、剪贴板、应用名、URL 或凭据。
@@ -62,7 +62,7 @@ TypeTide 把翻译变成一个原地完成的系统动作。它常驻菜单栏�
 |---|---|---|---|
 | 任何应用里都能用（邮件、聊天、IDE、终端） | ✅ | ❌（来回粘贴） | ⚠️ 仅菜单 |
 | 回复场景**原地改写** | ✅ | ❌ | ❌ |
-| 100% 离线 / 私密 | ✅（Ollama） | ❌ | ⚠️ |
+| 100% 离线 / 私密 | ✅（内置模型或本地 Ollama） | ❌ | ⚠️ |
 | 自选模型 / 接口 | ✅ | ❌ | ❌ |
 | 流式输出 | ✅ | ⚠️ | ❌ |
 
@@ -74,27 +74,29 @@ macOS 和 Windows 使用完全相同的 10 种检测与翻译语言：**English�
 
 ## 🚀 快速开始
 
-**1. 选一个后端**
-
-本地（私密、离线）——先安装 [Ollama](https://ollama.com/download)，然后：
-```bash
-# macOS: brew install ollama · Windows: winget install Ollama.Ollama
-ollama pull qwen2.5:3b   # 或任何你喜欢的对话模型
-ollama serve             # 通常已作为服务在运行
-```
-……或者用云端：在**设置 → Backend** 里选 *OpenAI-compatible*，填入 base URL、API key 和模型名。
-
-TypeTide 会在**设置 → Backend** 里列出你已安装的模型；配置的模型没装时会自动换成已装的——拉取*任意*一个对话模型就能跑起来。
-
-**2. 安装 TypeTide**
+**1. 安装 TypeTide**
 
 macOS——推荐用 [Homebrew](https://brew.sh)：
 ```bash
 brew install --cask everettjf/tap/typetide
 ```
-……或者从 [Releases](https://github.com/everettjf/typetide/releases/latest) 下载最新 `.dmg`，拖进「应用程序」后启动。安装包已由 Apple 签名和公证。
+……或者从 [官方下载页](https://xnu.app/typetide/#top) 下载最新 `.dmg`，拖进「应用程序」后启动。安装包使用 Developer ID 签名，并通过 Apple 公证。
 
-Windows——从 [Releases](https://github.com/everettjf/typetide/releases/latest) 下载最新的 `TypeTide-Setup-x.y.z.exe` 安装包运行即可（按用户安装，无需管理员权限；也提供便携版 `TypeTide-Windows-x.y.z.zip`）。如果 SmartScreen 提示无法识别的应用，点**更多信息 → 仍要运行**。
+Windows——从 [官方下载页](https://xnu.app/typetide/#top) 下载最新的 `TypeTide-Setup-x.y.z.exe` 安装包运行即可（按用户安装，无需管理员权限；也提供便携版 `TypeTide-Windows-x.y.z.zip`）。如果 SmartScreen 提示无法识别的应用，点**更多信息 → 仍要运行**。
+
+**2. 选一个后端**
+
+**Apple Silicon Mac：**保留默认的 **Built-in (Offline)**，在首次设置或 **Settings → Backend** 中下载模型（约 2.22 GB）。下载后可离线翻译，无需账号、API Key、Ollama 或 Python。支持忠实翻译；超过 2K 输入 token 的长文本需要分段。模型遵循 [Gemma 使用条款](https://ai.google.dev/gemma/terms)。
+
+**Intel Mac、Windows，或希望使用其他本地模型：**先安装 [Ollama](https://ollama.com/download)，然后：
+```bash
+# macOS: brew install ollama · Windows: winget install Ollama.Ollama
+ollama pull qwen3.5:4b   # 或任何你喜欢的对话模型
+ollama serve             # 通常已作为服务在运行
+```
+……或者用云端：在**设置 → Backend** 里选 *OpenAI-compatible*，填入 base URL、API key 和模型名。
+
+TypeTide 会在**设置 → Backend** 里列出你已安装的模型；配置的模型没装时会自动换成已装的——拉取*任意*一个对话模型就能跑起来。
 
 **3. 首次运行**
 
@@ -121,7 +123,7 @@ macOS：在**系统设置 → 隐私与安全性 → 辅助功能**里允许 Typ
                         │
         取词（AX / UI Automation 选区 ─► 剪贴板兜底）
                         │
-          翻译（Ollama / OpenAI 兼容，流式）
+          翻译（内置 MLX / Ollama / OpenAI 兼容，流式）
                         │
       读：弹窗展示  ·  写：原地粘贴（可撤销）
 ```
@@ -130,6 +132,7 @@ macOS：在**系统设置 → 隐私与安全性 → 辅助功能**里允许 Typ
 
 TypeTide 能跨应用读取和替换选中文字，因此 macOS 需要辅助功能权限；Windows 通过 UI Automation 工作，无需单独授权。只有在触发快捷键、点击浮动图标或开启划词自动翻译后，应用才会取词。可在**设置 → Excluded apps** 中停用包含敏感信息的应用；如果不希望监听选区，请使用**仅快捷键**模式。
 
+- 使用 Apple Silicon 上的**内置离线模型**时，文字在 Mac 上处理；首次使用需联网下载模型。
 - 使用 **Ollama** 时，取到的文字只会发往本机 `127.0.0.1` 上的 Ollama 服务；TypeTide 没有中转服务器或遥测服务。
 - 使用 **OpenAI 兼容后端**时，触发翻译后，取到的文字会发往你配置的 base URL，并受该服务商的数据保留与隐私政策约束。密码、密钥和敏感对话不应使用云端后端处理。
 - 某些应用不通过辅助功能接口暴露选区。TypeTide 会临时复制选区，读取后恢复原剪贴板；剪贴板历史或第三方剪贴板管理器仍可能记录这次临时复制。
