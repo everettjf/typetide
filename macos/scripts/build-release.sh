@@ -159,29 +159,13 @@ info "Step 5/6: Creating DMG..."
 DMG_NAME="$APP_NAME-$VERSION.dmg"
 DMG_PATH="$BUILD_DIR/$DMG_NAME"
 
-# 检查是否安装了 create-dmg
-if ! command -v create-dmg &> /dev/null; then
-    warning "create-dmg not found, installing via Homebrew..."
-    if command -v brew &> /dev/null; then
-        brew install create-dmg
-    else
-        error "Homebrew not found. Please install create-dmg manually:\nbrew install create-dmg"
-    fi
-fi
-
-# 创建 DMG
-create-dmg \
-    --volname "$APP_NAME" \
-    --volicon "$APP_PATH/Contents/Resources/AppIcon.icns" \
-    --window-pos 200 120 \
-    --window-size 600 400 \
-    --icon-size 100 \
-    --icon "$APP_NAME.app" 150 200 \
-    --hide-extension "$APP_NAME.app" \
-    --app-drop-link 450 200 \
-    --no-internet-enable \
-    "$DMG_PATH" \
-    "$APP_PATH" || error "DMG creation failed"
+# Build without Finder/AppleScript so packaging also works in headless sessions.
+DMG_STAGING="$BUILD_DIR/dmg-staging"
+mkdir -p "$DMG_STAGING"
+ditto "$APP_PATH" "$DMG_STAGING/$APP_NAME.app"
+ln -s /Applications "$DMG_STAGING/Applications"
+hdiutil create -volname "$APP_NAME" -srcfolder "$DMG_STAGING" \
+    -ov -format UDZO "$DMG_PATH" || error "DMG creation failed"
 
 success "DMG created at $DMG_PATH"
 
