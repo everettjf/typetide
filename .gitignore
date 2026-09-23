@@ -8,7 +8,10 @@ build/
 
 # Xcode
 macos/TypeTide.xcodeproj/project.xcworkspace/xcuserdata
-macos/TypeTide.xcodeproj/project.xcworkspace/xcshareddata
+macos/TypeTide.xcodeproj/project.xcworkspace/xcshareddata/*
+!macos/TypeTide.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+macos/TypeTide.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/*
+!macos/TypeTide.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 *.xcuserstate
 xcuserdata/
 DerivedData/

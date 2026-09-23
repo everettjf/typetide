@@ -9,7 +9,6 @@ struct GeneralSettingsView: View {
     @AppStorage(AppSettings.Keys.enabled) private var isEnabled = true
     @State private var hasPermission = AccessibilityPermission.isGranted
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
-    @State private var permissionTimer: Timer?
 
     var body: some View {
         Form {
@@ -39,7 +38,7 @@ struct GeneralSettingsView: View {
                     if hasPermission {
                         Text("Granted").foregroundColor(.blue).fontWeight(.medium)
                     } else {
-                        Button("Grant Permission") { AccessibilityPermission.requestAndOpenSystemSettings() }
+                        Button("Grant Permission") { AccessibilityPermission.request() }
                             .buttonStyle(.borderedProminent)
                             .controlSize(.small)
                     }
@@ -49,11 +48,14 @@ struct GeneralSettingsView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         SettingsNote(text: "TypeTide needs Accessibility permission to read selected text and replace text in other apps.",
                                      symbol: "exclamationmark.triangle.fill", tint: .orange)
-                        Text("In System Settings, turn on TypeTide. If it is not listed, click + and select TypeTide from Applications.")
+                        Text("In the macOS prompt, choose Open System Settings and enable TypeTide. If it is missing, Show Current App reveals the running copy; add that copy with + or drag it into the list.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Button("Open System Settings") { AccessibilityPermission.openSystemSettings() }
-                            .controlSize(.small)
+                        HStack {
+                            Button("Open System Settings") { AccessibilityPermission.openSystemSettings() }
+                            Button("Show Current App") { AccessibilityPermission.revealCurrentApp() }
+                        }
+                        .controlSize(.small)
                     }
                 }
             } header: {
@@ -75,15 +77,15 @@ struct GeneralSettingsView: View {
             }
         }
         .settingsPage("General")
-        .onAppear {
-            hasPermission = AccessibilityPermission.isGranted
-            permissionTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { _ in
-                Task { @MainActor in hasPermission = AccessibilityPermission.isGranted }
+        .task {
+            while !Task.isCancelled {
+                hasPermission = AccessibilityPermission.isGranted
+                do { try await Task.sleep(for: .seconds(1)) }
+                catch { return }
             }
         }
-        .onDisappear {
-            permissionTimer?.invalidate()
-            permissionTimer = nil
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            hasPermission = AccessibilityPermission.isGranted
         }
     }
 }

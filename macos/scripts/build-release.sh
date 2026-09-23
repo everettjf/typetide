@@ -109,6 +109,9 @@ xcodebuild archive \
     -configuration Release \
     -archivePath "$ARCHIVE_PATH" \
     -destination "generic/platform=macOS" \
+    CODE_SIGN_STYLE=Manual \
+    CODE_SIGN_IDENTITY="$DEVELOPER_ID_APPLICATION" \
+    DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
     || error "Archive build failed"
 
 success "Archive created at $ARCHIVE_PATH"
@@ -122,10 +125,15 @@ if [ ! -f "$EXPORT_OPTIONS" ]; then
     error "ExportOptions.plist not found at $EXPORT_OPTIONS"
 fi
 
+# Export with the same Developer ID identity used for the archive.
+RESOLVED_EXPORT_OPTIONS="$BUILD_DIR/ExportOptions.plist"
+cp "$EXPORT_OPTIONS" "$RESOLVED_EXPORT_OPTIONS"
+/usr/libexec/PlistBuddy -c "Add :teamID string $APPLE_TEAM_ID" "$RESOLVED_EXPORT_OPTIONS"
+
 xcodebuild -exportArchive \
     -archivePath "$ARCHIVE_PATH" \
     -exportPath "$EXPORT_DIR" \
-    -exportOptionsPlist "$EXPORT_OPTIONS" \
+    -exportOptionsPlist "$RESOLVED_EXPORT_OPTIONS" \
     || error "Export failed"
 
 success "Application exported to $EXPORT_DIR"

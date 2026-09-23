@@ -2,9 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- 导出方法: development (不签名，稍后手动签名) -->
+	<!-- Developer ID distribution for notarized downloads outside the App Store. -->
 	<key>method</key>
-	<string>development</string>
+	<string>developer-id</string>
 
 	<!-- 目标平台 -->
 	<key>destination</key>
@@ -14,8 +14,10 @@
 	<key>compileBitcode</key>
 	<false/>
 
-	<!-- 不在导出时签名，稍后用 codesign 手动签名 -->
+	<!-- Use the Developer ID certificate selected by the release script. -->
 	<key>signingStyle</key>
-	<string>automatic</string>
+	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Developer ID Application</string>
 </dict>
 </plist>

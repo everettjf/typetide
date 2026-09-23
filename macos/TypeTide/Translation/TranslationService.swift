@@ -22,6 +22,7 @@ final class TranslationService {
         if let providerOverride { return providerOverride }
 #endif
         switch AppSettings.backend {
+        case .builtIn: return LocalTranslationProvider()
         case .ollama: return OllamaProvider()
         case .openai: return OpenAIProvider()
         }
@@ -58,7 +59,7 @@ final class TranslationService {
                     Self.recordTranslation(outcome: "success", provider: provider.id, start: start,
                                            firstToken: firstToken, characterCount: characterCount)
                 } catch is CancellationError {
-                    continuation.finish()
+                    continuation.finish(throwing: CancellationError())
                     Self.recordTranslation(outcome: "cancelled", provider: provider.id, start: start,
                                            firstToken: firstToken, characterCount: characterCount)
                 } catch {
@@ -78,6 +79,7 @@ final class TranslationService {
         for try await delta in stream(text: text, from: from, to: to, style: style) {
             full += delta
         }
+        try Task.checkCancellation()
         let cleaned = full.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleaned.isEmpty else { throw TranslationError.empty }
         return cleaned

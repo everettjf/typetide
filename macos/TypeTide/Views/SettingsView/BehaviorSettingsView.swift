@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct BehaviorSettingsView: View {
+    @AppStorage(AppSettings.Keys.backend) private var backendRaw = TranslationBackend.builtIn.rawValue
     @AppStorage(AppSettings.Keys.selectionTrigger) private var selectionRaw = SelectionTrigger.none.rawValue
     @AppStorage(AppSettings.Keys.rewritePreview) private var rewritePreview = false
     @AppStorage(AppSettings.Keys.rewriteStyle) private var rewriteStyleRaw = RewriteStyle.faithful.rawValue
@@ -42,6 +43,9 @@ struct BehaviorSettingsView: View {
                     ForEach(RewriteStyle.allCases) { s in
                         Text(s.displayName).tag(s.rawValue)
                     }
+                }
+                if backendRaw == TranslationBackend.builtIn.rawValue {
+                    SettingsNote(text: "The built-in model supports Faithful translation only. Select Faithful here, or choose Ollama/API in Backend for other styles.", tint: .orange)
                 }
             } header: {
                 SettingsSectionHeader(symbol: "pencil.and.outline", color: .purple,

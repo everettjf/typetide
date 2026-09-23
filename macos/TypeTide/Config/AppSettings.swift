@@ -49,13 +49,15 @@ struct StoredShortcutPreference: Codable {
 
 /// 翻译后端
 enum TranslationBackend: String, CaseIterable, Identifiable {
+    case builtIn
     case ollama
     case openai
 
     var id: String { rawValue }
     var displayName: String {
         switch self {
-        case .ollama: return "Local (Ollama)"
+        case .builtIn: return "Built-in (Offline)"
+        case .ollama: return "Ollama"
         case .openai: return "OpenAI-compatible"
         }
     }
@@ -175,7 +177,7 @@ enum AppSettings {
     }
 
     static var backend: TranslationBackend {
-        get { TranslationBackend(rawValue: d.string(forKey: Keys.backend) ?? "") ?? .ollama }
+        get { TranslationBackend(rawValue: d.string(forKey: Keys.backend) ?? "") ?? .builtIn }
         set { d.set(newValue.rawValue, forKey: Keys.backend) }
     }
 

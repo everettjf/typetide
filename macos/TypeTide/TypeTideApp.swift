@@ -17,7 +17,7 @@ struct TypeTideApp: App {
             SettingsView()
         }
         .windowToolbarStyle(.unifiedCompact)
-        .defaultSize(width: 780, height: 500)
+        .defaultSize(width: 860, height: 640)
     }
 }
 
@@ -31,7 +31,7 @@ enum SettingsOpener {
         if windowController == nil {
             let host = NSHostingController(rootView: SettingsView())
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 780, height: 500),
+                contentRect: NSRect(x: 0, y: 0, width: 860, height: 640),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable],
                 backing: .buffered,
                 defer: false
@@ -40,6 +40,11 @@ enum SettingsOpener {
             window.contentViewController = host
             window.isReleasedWhenClosed = false
             window.setFrameAutosaveName("TypeTideSettingsWindow")
+            // Clamp restored windows too: older releases saved a shorter setup window.
+            window.contentMinSize = NSSize(width: 780, height: 560)
+            let contentSize = window.contentRect(forFrameRect: window.frame).size
+            window.setContentSize(NSSize(width: max(780, contentSize.width),
+                                         height: max(560, contentSize.height)))
             window.center()
             windowController = NSWindowController(window: window)
         }

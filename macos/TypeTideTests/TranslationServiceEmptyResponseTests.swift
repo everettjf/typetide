@@ -44,3 +44,25 @@ final class TranslationServiceEmptyResponseTests: XCTestCase {
         XCTAssertEqual(result.message, "Empty translation")
     }
 }
+
+private struct CancelledTranslationProvider: TranslationProvider {
+    let id = "cancelled-test-provider"
+    func stream(_ request: TranslationRequest) -> AsyncThrowingStream<String, Error> {
+        AsyncThrowingStream { continuation in
+            continuation.yield("incomplete")
+            continuation.finish(throwing: CancellationError())
+        }
+    }
+}
+
+extension TranslationServiceEmptyResponseTests {
+    func testCancelledStreamNeverReturnsPartialTextForReplacement() async {
+        TranslationService.shared.providerOverride = CancelledTranslationProvider()
+        do {
+            _ = try await TranslationService.shared.translateFully(text: "cancelled synthetic input", from: .english, to: .chinese)
+            XCTFail("Partial translations must never be returned for replacement")
+        } catch is CancellationError {
+            // Expected: preserve the original selected text.
+        } catch { XCTFail("Unexpected error: \(error)") }
+    }
+}

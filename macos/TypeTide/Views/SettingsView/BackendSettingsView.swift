@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BackendSettingsView: View {
-    @AppStorage(AppSettings.Keys.backend) private var backendRaw = TranslationBackend.ollama.rawValue
+    @AppStorage(AppSettings.Keys.backend) private var backendRaw = TranslationBackend.builtIn.rawValue
     @AppStorage(AppSettings.Keys.openAIBaseURL) private var openAIBaseURL = "https://api.openai.com/v1"
     @State private var openAIKey = AppSettings.openAIKey
     @AppStorage(AppSettings.Keys.openAIModel) private var openAIModel = "gpt-4o-mini"
@@ -54,6 +54,10 @@ struct BackendSettingsView: View {
                     )
                 } header: {
                     SettingsSectionHeader(symbol: "cloud.fill", color: .indigo, title: "OpenAI-compatible")
+                }
+            } else if backendRaw == TranslationBackend.builtIn.rawValue {
+                Section { BuiltInModelSettingsView() } header: {
+                    SettingsSectionHeader(symbol: "cpu", color: .green, title: "Built-in translation", subtitle: "Runs privately on this Mac")
                 }
             } else {
                 Section {

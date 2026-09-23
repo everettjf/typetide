@@ -4,6 +4,7 @@ struct FirstLaunchView: View {
     let openSection: (PreferencesSection) -> Void
     let finish: () -> Void
 
+    @AppStorage(AppSettings.Keys.backend) private var backendRaw = TranslationBackend.builtIn.rawValue
     @State private var hasPermission = AccessibilityPermission.isGranted
     @State private var backendResult: BackendHealthResult?
     @State private var isTestingBackend = false
@@ -45,20 +46,35 @@ struct FirstLaunchView: View {
                     ready: hasPermission,
                     action: {
                         if hasPermission { recheck() }
-                        else { AccessibilityPermission.requestAndOpenSystemSettings() }
+                        else { AccessibilityPermission.request() }
                     },
                     actionLabel: hasPermission ? "Recheck" : "Grant Permission"
                 )
 
+                if !hasPermission {
+                    VStack(alignment: .leading, spacing: 8) {
+                        SettingsNote(text: "In the macOS permission prompt, choose Open System Settings, then enable TypeTide. Permission status updates automatically when you return.")
+                        HStack {
+                            Button("Open System Settings") { AccessibilityPermission.openSystemSettings() }
+                            Button("Show Current App") { AccessibilityPermission.revealCurrentApp() }
+                        }
+                        SettingsNote(text: "If TypeTide is missing from the list, Show Current App reveals this running copy so you can add it with + or drag it into the list.")
+                    }
+                }
+
                 setupRow(
                     step: 2,
                     title: "Translation backend",
-                    detail: backendResult?.message ?? "Test Ollama or your configured cloud endpoint with synthetic text.",
+                    detail: backendResult?.message ?? "Download the built-in model below, or configure Ollama/API, then test with synthetic text.",
                     ready: backendReady,
                     action: { Task { await testBackend() } },
                     actionLabel: isTestingBackend ? "Testing…" : "Test Connection"
                 )
                 .disabled(isTestingBackend)
+
+                if backendRaw == TranslationBackend.builtIn.rawValue {
+                    BuiltInModelSettingsView()
+                }
 
                 setupRow(
                     step: 3,
@@ -74,15 +90,6 @@ struct FirstLaunchView: View {
                     actionLabel: "Verify"
                 )
 
-                HStack {
-                    Button("Configure Backend") { openSection(.backend) }
-                    Button("Edit Shortcuts") { openSection(.shortcuts) }
-                    Spacer()
-                    Button("Finish Setup", action: finish)
-                        .buttonStyle(.borderedProminent)
-                        .disabled(!canFinish)
-                }
-
                 SettingsNote(
                     text: "Diagnostics stay on this Mac and never include selected text, translations, clipboard contents, app names, endpoint URLs, or credentials.",
                     symbol: "hand.raised.fill",
@@ -92,8 +99,36 @@ struct FirstLaunchView: View {
             .padding(28)
             .frame(maxWidth: 680, alignment: .leading)
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            VStack(spacing: 0) {
+                Divider()
+                HStack(spacing: 12) {
+                    Button("Configure Backend") { openSection(.backend) }
+                    Button("Edit Shortcuts") { openSection(.shortcuts) }
+                    Spacer(minLength: 12)
+                    Button("Finish Setup", action: finish)
+                        .buttonStyle(.borderedProminent)
+                        .disabled(!canFinish)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 16)
+            }
+            .background(.bar)
+        }
         .navigationTitle("First Run")
-        .onAppear { recheck() }
+        .task {
+            // Poll only while the setup view is visible; never re-prompt while polling.
+            while !Task.isCancelled {
+                recheck()
+                do { try await Task.sleep(for: .seconds(1)) }
+                catch { return }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            recheck()
+        }
+        .onChange(of: backendRaw) { _, _ in backendResult = nil }
     }
 
     private func setupRow(
@@ -118,9 +153,11 @@ struct FirstLaunchView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title).font(.headline)
                 Text(detail).font(.callout).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Spacer()
             Button(actionLabel, action: action)
+                .fixedSize()
         }
         .padding(14)
         .background(.quaternary, in: .rect(cornerRadius: TypeTideTheme.Radius.card))

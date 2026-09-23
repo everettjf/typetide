@@ -4,7 +4,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/macOS-26+-black.svg" />
   <img src="https://img.shields.io/badge/Windows-10+-0078d4.svg" />
-  <img src="https://img.shields.io/badge/Swift-5.9+-orange.svg" />
+  <img src="https://img.shields.io/badge/Swift-6.2+-orange.svg" />
   <img src="https://img.shields.io/badge/C++-20-00599c.svg" />
   <img src="https://img.shields.io/badge/AI-Ollama%20%7C%20OpenAI--compatible-7c5cff.svg" />
   <img src="https://img.shields.io/badge/License-MIT-green.svg" />
@@ -22,7 +22,7 @@ TypeTide turns translation into an in-place system action. It lives in your menu
 - **Read** — select foreign text, hit a shortcut, and a translation pops up next to it.
 - **Write** — **type in your own language**, hit a shortcut, and it’s rewritten in place into the target language, ready to send.
 
-No browser tab and no copy-paste loop. Translation runs through a local model (**Ollama**) for privacy and offline use, or a cloud endpoint you choose for speed.
+No browser tab and no copy-paste loop. On Apple Silicon Macs, translation defaults to an **integrated MLX model**, downloaded once and run offline without Ollama. You can also choose **Ollama** or an **OpenAI-compatible** endpoint. Windows continues to use Ollama or an API.
 
 <p align="center">
   <img src="docs/screenshots/tide-transition.gif" alt="TypeTide's particle tide sweeps across selected text while the translation streams in" width="760" />
@@ -52,7 +52,7 @@ No browser tab and no copy-paste loop. Translation runs through a local model (*
 - **Write · rewrite in place** — write in your native language, press the rewrite shortcut, and the input field is replaced with the translation. Replace immediately or preview first.
 - **Works in every app** — uses the Accessibility API (macOS) / UI Automation (Windows) to read the selection, with a clipboard-copy fallback for Electron/web apps, so it works even where text APIs don’t. The original clipboard is always restored.
 - **Undo-safe replacement** — replacements are pasted, preserving each app’s native undo stack.
-- **Local or cloud** — pluggable backends: **Ollama** (offline, private) or any **OpenAI-compatible** API (`/chat/completions`, streaming). Switch in Settings.
+- **Local or cloud** — pluggable backends: **Built-in MLX** (Apple Silicon Mac), **Ollama** (offline, private), or any **OpenAI-compatible** API (`/chat/completions`, streaming). Switch in Settings.
 - **Model picker** — Settings lists your installed Ollama models, recommends a comfortable size from physical memory, and auto-selects an installed model when the configured one is missing. Thinking models (qwen3 family, …) are handled — hidden reasoning is disabled so translations stay instant.
 - **Styles** — Faithful, Formal, Casual, or Polished, independently for read and rewrite.
 - **Shortcut actions** — each of the two global shortcuts can independently use smart direction or a fixed native/foreign target, then show a popup or replace in place.
@@ -81,7 +81,9 @@ Pick your native and foreign language in **Settings → Language**. Each Read/Wr
 
 **1. Pick a backend**
 
-Local (private, offline) — install [Ollama](https://ollama.com/download), then:
+**macOS (Apple Silicon):** keep the default **Built-in (Offline)** backend and click **Download Model** in first-run setup or **Settings → Backend**. The pinned TranslateGemma 4B 4-bit model downloads about 2.22 GB from Hugging Face; selected text never leaves the Mac. No Ollama, Python, account, or API key is needed. Model memory is released after two idle minutes. This backend supports Faithful translation and in-place replacement; other writing styles require Ollama/API. Long selections over the model's 2K input-token limit produce an actionable error instead of being silently truncated. Model use is subject to the [Gemma terms](https://ai.google.dev/gemma/terms).
+
+**Windows or optional Mac backend:** install [Ollama](https://ollama.com/download), then:
 ```bash
 # macOS: brew install ollama · Windows: winget install Ollama.Ollama
 ollama pull qwen3.5:4b   # or any compact chat model that fits your hardware
@@ -176,7 +178,7 @@ open TypeTide.xcodeproj          # ⌘R to run
 ./scripts/build-release.sh      # → build/TypeTide-x.y.z.dmg
 ```
 
-Requirements: macOS 26+, Xcode 15+. The app is **not** sandboxed (it needs Accessibility + synthetic key events). For local dev builds, sign with your Apple Development team so the Accessibility grant persists across rebuilds.
+Requirements: macOS 26+, Xcode 26+ with Swift 6.2+ and the Metal Toolchain (`xcodebuild -downloadComponent MetalToolchain`). Built-in MLX translation requires Apple Silicon. The app is **not** sandboxed (it needs Accessibility + synthetic key events). For local dev builds, sign with your Apple Development team so the Accessibility grant persists across rebuilds.
 
 Windows:
 ```powershell

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		5A86A34F2E9415F300CA8E22 /* Ollama in Frameworks */ = {isa = PBXBuildFile; productRef = 5A86A34E2E9415F300CA8E22 /* Ollama */; };
+		8B0000010000000000000001 /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 8B0000020000000000000001 /* MLXLLM */; };
+		8B0000010000000000000002 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 8B0000020000000000000002 /* MLXLMCommon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +54,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A86A34F2E9415F300CA8E22 /* Ollama in Frameworks */,
+				8B0000010000000000000002 /* MLXLMCommon in Frameworks */,
+				8B0000010000000000000001 /* MLXLLM in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +129,8 @@
 			name = TypeTide;
 			packageProductDependencies = (
 				5A86A34E2E9415F300CA8E22 /* Ollama */,
+				8B0000020000000000000002 /* MLXLMCommon */,
+				8B0000020000000000000001 /* MLXLLM */,
 			);
 			productName = TypeTide;
 			productReference = 5ACBDEF62E8A12F400DD7984 /* TypeTide.app */;
@@ -157,6 +163,7 @@
 			mainGroup = 5ACBDEED2E8A12F400DD7984;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				8B0000030000000000000001 /* mlx-swift-lm */,
 				5A86A34D2E9415F300CA8E22 /* XCRemoteSwiftPackageReference "ollama-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -348,7 +355,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.14;
+				MARKETING_VERSION = 0.1.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xnu.typetide;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -395,7 +402,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1.14;
+				MARKETING_VERSION = 0.1.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xnu.typetide;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -453,6 +460,7 @@
 				minimumVersion = 1.8.0;
 			};
 		};
+		8B0000030000000000000001 /* mlx-swift-lm */ = {isa = XCRemoteSwiftPackageReference; repositoryURL = "https://github.com/ml-explore/mlx-swift-lm"; requirement = {kind = exactVersion; version = 2.30.6; }; };
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -461,6 +469,8 @@
 			package = 5A86A34D2E9415F300CA8E22 /* XCRemoteSwiftPackageReference "ollama-swift" */;
 			productName = Ollama;
 		};
+		8B0000020000000000000001 /* MLXLLM */ = {isa = XCSwiftPackageProductDependency; package = 8B0000030000000000000001; productName = MLXLLM; };
+		8B0000020000000000000002 /* MLXLMCommon */ = {isa = XCSwiftPackageProductDependency; package = 8B0000030000000000000001; productName = MLXLMCommon; };
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5ACBDEEE2E8A12F400DD7984 /* Project object */;

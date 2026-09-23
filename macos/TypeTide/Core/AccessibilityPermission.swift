@@ -11,7 +11,9 @@ import AppKit
 enum AccessibilityPermission {
     static var isGranted: Bool { AXIsProcessTrusted() }
 
-    /// 请求权限（首次会弹出系统提示）。
+    /// Request the system prompt only. This is asynchronous: opening Settings on a
+    /// timer races the prompt and does not guarantee TCC has registered this app.
+    /// The user opens Settings from the system prompt or an explicit fallback button.
     static func request() {
         let options: NSDictionary = [
             kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true
@@ -19,15 +21,10 @@ enum AccessibilityPermission {
         _ = AXIsProcessTrustedWithOptions(options as CFDictionary)
     }
 
-    /// 先让 TCC 登记当前签名应用，再打开对应设置页供用户亲自开启开关。
-    /// macOS 出于安全原因不允许应用替用户授予或启用这项权限。
+    /// Reveal the running bundle, not another installed copy with the same name.
     @MainActor
-    static func requestAndOpenSystemSettings() {
-        request()
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(350))
-            openSystemSettings()
-        }
+    static func revealCurrentApp() {
+        NSWorkspace.shared.activateFileViewerSelecting([Bundle.main.bundleURL])
     }
 
     static func openSystemSettings() {

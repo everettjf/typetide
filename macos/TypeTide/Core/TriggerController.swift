@@ -113,7 +113,7 @@ final class TriggerController {
     func handleRead(action: ShortcutAction = .smartPopup) {
         guard AppSettings.isEnabled else { return }
         guard AccessibilityPermission.isGranted else {
-            AccessibilityPermission.requestAndOpenSystemSettings()
+            AccessibilityPermission.request()
             return
         }
         guard !AppSettings.shouldSkipFrontmostApplication() else { return }
@@ -211,7 +211,7 @@ final class TriggerController {
     func handleRewrite(action: ShortcutAction = .smartReplace) {
         guard AppSettings.isEnabled else { return }
         guard AccessibilityPermission.isGranted else {
-            AccessibilityPermission.requestAndOpenSystemSettings()
+            AccessibilityPermission.request()
             return
         }
         guard !AppSettings.shouldSkipFrontmostApplication() else { return }

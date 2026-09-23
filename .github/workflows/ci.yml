@@ -53,6 +53,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Ensure Metal compiler for MLX
+        run: xcrun metal --version >/dev/null 2>&1 || xcodebuild -downloadComponent MetalToolchain
+
       - name: XCTest (unsigned)
         run: |
           xcodebuild -project TypeTide.xcodeproj -scheme TypeTide \

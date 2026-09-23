@@ -18,14 +18,14 @@ Shortcut / SelectionMonitor ─► SelectionCapture ─► TranslationService �
                               Popup / TextReplacer  ◄──────────── streamed result
 ```
 
-Backends: Ollama (default `http://127.0.0.1:11434`) or any OpenAI-compatible
+Backends: macOS defaults to built-in MLX / TranslateGemma 4B (Apple Silicon, one-time model download). Ollama (`http://127.0.0.1:11434`) remains selectable on both platforms, as does any OpenAI-compatible
 endpoint (`/chat/completions`, SSE streaming). 10 languages, native/foreign
 pair, per-shortcut direction (auto-detect or fixed), 4 rewrite styles.
 
 ## macOS (`macos/`)
 
 - `Core/` — `SelectionCapture` (AX `kAXSelectedText` + synthetic-⌘C fallback, restores clipboard), `TextReplacer` (synthetic paste, undo-safe), `TriggerController` (orchestrates read/write), `SelectionMonitor` (global mouse-up → AX selection), `PopupPositioner`, `Keyboard`, `Pasteboard`, `AccessibilityPermission`, `LaunchAtLogin`.
-- `Translation/` — `TranslationProvider` protocol; `OllamaProvider`, `OpenAIProvider` (SSE); `TranslationService` (routing + cache + style); `TranslationCache`; `OllamaModelResolver` (auto-pick installed model).
+- `Translation/` — `TranslationProvider` protocol; `LocalTranslationProvider` (MLX, faithful translation), `BuiltInModelManager` (pinned and verified downloads), `OllamaProvider`, `OpenAIProvider` (SSE); `TranslationService` (routing + cache + style); `TranslationCache`; `OllamaModelResolver` (auto-pick installed model).
 - `UI/` — `TranslationPopupView` + `PopupController`, `SelectionIconWindow`.
 - `Config/` — `AppSettings` (single source of truth, UserDefaults-backed), `LanguageConfig`.
 - `Services/` — `GlobalShortcutCenter` (Carbon, multi-hotkey), `UpdateChecker`, `SystemServiceProvider`.
