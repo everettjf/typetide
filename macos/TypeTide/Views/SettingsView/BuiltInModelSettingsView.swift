@@ -13,18 +13,20 @@ struct BuiltInModelSettingsView: View {
                     .foregroundStyle(.green)
             } else if model.isDownloading {
                 ProgressView(value: model.progress)
+                if !model.transferDetail.isEmpty { Text(model.transferDetail).font(.caption).monospacedDigit() }
                 HStack {
                     Text("\(model.status) \(Int(model.progress * 100))%")
                         .font(.caption).foregroundStyle(.secondary)
                     Spacer()
-                    Button("Cancel") { model.cancel() }
+                    Button("Pause") { model.cancel() }
                 }
             } else {
-                Button(model.error == nil ? "Download Model · 2.22 GB" : "Retry Download · 2.22 GB") { model.download() }
+                Button(model.status.isEmpty ? "Download Model · 2.22 GB" : "Resume Download") { model.download() }
                     .buttonStyle(.borderedProminent)
                 if !model.status.isEmpty { Text(model.status).font(.caption).foregroundStyle(.secondary) }
             }
             if let error = model.error { SettingsNote(text: error, tint: .orange) }
+            if !model.installed { SettingsNote(text: "Source: Hugging Face. Downloads use two connections and save completed 16 MB segments. Pause or quit safely; allow about 4.5 GB of free disk space during installation.") }
             SettingsNote(text: "No Ollama or account required. The first download comes from Hugging Face; selected text stays on this Mac. Afterwards, translation works without internet.", symbol: "hand.raised.fill", tint: .green)
             SettingsNote(text: "Supports Faithful translation, including Replace. For Formal, Casual or Polished writing styles, choose Ollama or an API backend. Model memory is released after two idle minutes.")
             HStack {

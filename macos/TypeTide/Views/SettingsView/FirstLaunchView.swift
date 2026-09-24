@@ -52,14 +52,7 @@ struct FirstLaunchView: View {
                 )
 
                 if !hasPermission {
-                    VStack(alignment: .leading, spacing: 8) {
-                        SettingsNote(text: "In the macOS permission prompt, choose Open System Settings, then enable TypeTide. Permission status updates automatically when you return.")
-                        HStack {
-                            Button("Open System Settings") { AccessibilityPermission.openSystemSettings() }
-                            Button("Show Current App") { AccessibilityPermission.revealCurrentApp() }
-                        }
-                        SettingsNote(text: "If TypeTide is missing from the list, Show Current App reveals this running copy so you can add it with + or drag it into the list.")
-                    }
+                    AccessibilityHelpView()
                 }
 
                 setupRow(

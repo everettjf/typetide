@@ -45,18 +45,7 @@ struct GeneralSettingsView: View {
                 }
 
                 if !hasPermission {
-                    VStack(alignment: .leading, spacing: 8) {
-                        SettingsNote(text: "TypeTide needs Accessibility permission to read selected text and replace text in other apps.",
-                                     symbol: "exclamationmark.triangle.fill", tint: .orange)
-                        Text("In the macOS prompt, choose Open System Settings and enable TypeTide. If it is missing, Show Current App reveals the running copy; add that copy with + or drag it into the list.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        HStack {
-                            Button("Open System Settings") { AccessibilityPermission.openSystemSettings() }
-                            Button("Show Current App") { AccessibilityPermission.revealCurrentApp() }
-                        }
-                        .controlSize(.small)
-                    }
+                    AccessibilityHelpView()
                 }
             } header: {
                 SettingsSectionHeader(symbol: "gearshape.fill", color: .blue,
