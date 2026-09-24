@@ -24,7 +24,7 @@ Want to read before you send? Flip on rewrite **preview** in Settings and approv
 
 Apple Silicon Macs default to a built-in offline model; three backend options are available:
 
-- **Built-in (Apple Silicon Mac)** — download TranslateGemma 4B once (about 2.22 GB), then translate offline without an account, API key, Ollama, or Python setup. Supports Faithful translation and in-place replacement; selections above the 2K input-token limit need to be shortened.
+- **Built-in (Apple Silicon Mac)** — download TranslateGemma 4B once (about 2.22 GB), then translate offline without an account, API key, Ollama, or Python setup. Downloads can pause and resume across restarts, show speed and time estimates, and verify files before use. Allow about 4.5 GB free during installation. Supports Faithful translation and in-place replacement; selections above the 2K input-token limit need to be shortened.
 - **Ollama (local)** — run a model like `qwen2.5:3b` on your own machine. Nothing leaves your Mac, it works on a plane, and there's no per-token bill. If your configured model isn't installed, TypeTide auto-picks one that is.
 - **OpenAI-compatible (cloud)** — point it at any `/chat/completions` endpoint with a base URL, key, and model name. Great when you want maximum speed or a frontier model.
 

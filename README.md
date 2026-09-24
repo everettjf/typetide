@@ -107,7 +107,7 @@ TypeTide lists your installed models in **Settings → Backend** and auto-picks 
 
 **3. First run**
 
-macOS: allow TypeTide under **System Settings → Privacy & Security → Accessibility** (required to read selections and replace text). Windows needs no special permission. Then:
+macOS: allow TypeTide under **System Settings → Privacy & Security → Accessibility** (required to read selections and replace text). If TypeTide is missing, click **Show Current App** in setup and drag that copy into the permission list, then enable it. If an older copy has a stale grant, remove its entry and add the current copy again. Permission status refreshes automatically. Windows needs no special permission. Then:
 
 - Select text → **⌥D** (macOS) / **Alt+D** (Windows) → see the translation.
 - Type in your language → **⌥R** / **Alt+R** → it’s rewritten in place.

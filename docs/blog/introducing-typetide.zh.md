@@ -38,7 +38,7 @@ TypeTide 用"粘贴"的方式写回结果，所以 App 原生的 **撤销** 依�
 
 Apple Silicon Mac 默认使用内置离线模型，也可以选择其他后端：
 
-- **内置离线模型（Apple Silicon Mac）** —— 下载约 2.22 GB 的 TranslateGemma 4B 后即可离线翻译，无需账号、API Key、Ollama 或 Python。支持忠实翻译与原位替换；超过 2K 输入 token 的长文本需要分段。
+- **内置离线模型（Apple Silicon Mac）** —— 下载约 2.22 GB 的 TranslateGemma 4B 后即可离线翻译，无需账号、API Key、Ollama 或 Python。下载可暂停并在重启后续传，显示速度与预计剩余时间，校验文件后才会使用；安装期间预留约 4.5 GB 空间。支持忠实翻译与原位替换；超过 2K 输入 token 的长文本需要分段。
 - **Ollama（本地）** —— 在自己机器上跑 `qwen2.5:3b` 这样的模型。数据不出本机，在飞机上也能用，也没有按 token 计费。如果你配置的模型没装，TypeTide 会自动挑一个已装的。
 - **OpenAI 兼容（云端）** —— 指向任意 `/chat/completions` 接口，填好 base URL、key 和模型名即可。想要极致速度或前沿模型时很合适。
 

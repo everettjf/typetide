@@ -86,7 +86,7 @@ Windows——从 [官方下载页](https://xnu.app/typetide/#top) 下载最新�
 
 **2. 选一个后端**
 
-**Apple Silicon Mac：**保留默认的 **Built-in (Offline)**，在首次设置或 **Settings → Backend** 中下载模型（约 2.22 GB）。下载后可离线翻译，无需账号、API Key、Ollama 或 Python。支持忠实翻译；超过 2K 输入 token 的长文本需要分段。模型遵循 [Gemma 使用条款](https://ai.google.dev/gemma/terms)。
+**Apple Silicon Mac：**保留默认的 **Built-in (Offline)**，在首次设置或 **Settings → Backend** 中从 Hugging Face 下载模型（约 2.22 GB）。下载使用双连接，显示速度与预计剩余时间；暂停或退出后可续传已保存的 16 MiB 分片。安装期间请预留约 4.5 GB 空间，所有文件校验通过后才会使用。下载后可离线翻译，无需账号、API Key、Ollama 或 Python。支持忠实翻译；超过 2K 输入 token 的长文本需要分段。模型遵循 [Gemma 使用条款](https://ai.google.dev/gemma/terms)。
 
 **Intel Mac、Windows，或希望使用其他本地模型：**先安装 [Ollama](https://ollama.com/download)，然后：
 ```bash
@@ -100,7 +100,7 @@ TypeTide 会在**设置 → Backend** 里列出你已安装的模型；配置的
 
 **3. 首次运行**
 
-macOS：在**系统设置 → 隐私与安全性 → 辅助功能**里允许 TypeTide（读取选区和替换文字需要）。Windows 无需任何特殊权限。然后：
+macOS：在**系统设置 → 隐私与安全性 → 辅助功能**里允许 TypeTide（读取选区和替换文字需要）。若列表里没有 TypeTide，点击应用中的 **Show Current App**，将显示的当前应用拖入权限列表并开启；若旧副本授权失效，移除旧条目后重新添加。权限状态会自动刷新。Windows 无需任何特殊权限。然后：
 
 - 选中文字 → **⌥D**（macOS）/ **Alt+D**（Windows）→ 看译文。
 - 用母语输入 → **⌥R** / **Alt+R** → 原地改写。
