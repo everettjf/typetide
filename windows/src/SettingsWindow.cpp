@@ -1,5 +1,6 @@
 #include "SettingsWindow.h"
 #include "App.h"
+#include "BuiltInModel.h"
 #include "LaunchAtLogin.h"
 #include "LocalDiagnostics.h"
 #include "OllamaModels.h"
@@ -15,6 +16,8 @@
 #include <shellapi.h>
 #include <uxtheme.h>
 #include <string>
+#include <atomic>
+#include <memory>
 #include <thread>
 #include <vector>
 
@@ -25,16 +28,23 @@ constexpr wchar_t kClassName[] = L"TypeTideSettings";
 constexpr UINT kMsgOllamaModels = WM_APP + 100;
 constexpr UINT kMsgUpdateResult = WM_APP + 101;
 constexpr UINT kMsgBackendHealth = WM_APP + 102;
+constexpr UINT kMsgBuiltInProgress = WM_APP + 103;
+
+struct BuiltInProgress {
+    double fraction = 0;
+    std::wstring status;
+    bool done = false;
+};
 
 enum CtrlId : int {
     kTab = 1000,
     // General
     kEnable, kLogin, kVersionLabel, kCheckUpdate, kFirstRunHint,
     // Backend
-    kBackendOllama, kBackendOpenAI,
+    kBackendBuiltIn, kBuiltInDownload, kBuiltInStatus, kBackendOllama, kBackendOpenAI,
     kOllamaModelLabel, kOllamaModel, kOllamaRefresh, kOllamaHint,
     kOaiProviderLabel, kOaiProvider,
-    kOaiUrlLabel, kOaiUrl, kOaiKeyLabel, kOaiKey, kOaiModelLabel, kOaiModel, kOaiHint,
+    kOaiUrlLabel, kOaiUrl, kOaiKeyLabel, kOaiKey, kOaiModelLabel, kOaiModel, kOaiHint, kPrivacyHint,
     kBackendTest, kBackendStatus,
     // Language
     kNativeLabel, kNative, kForeignLabel, kForeign,
@@ -71,6 +81,7 @@ struct State {
     bool shortcutsReady = false;
     bool dark = false;
     bool highContrast = false;
+    std::shared_ptr<std::atomic<bool>> modelDownloadCancel;
     int clientWidth = 0;
     int clientHeight = 0;
 };
@@ -411,12 +422,25 @@ void updateShortcutControls() {
 void updateBackendEnabled() {
     const Settings& s = Settings::shared();
     bool ollama = s.backend == TranslationBackend::Ollama;
+    bool cloud = s.backend == TranslationBackend::OpenAI;
     EnableWindow(ctrl(kOllamaModel), ollama);
     EnableWindow(ctrl(kOllamaRefresh), ollama);
-    EnableWindow(ctrl(kOaiProvider), !ollama);
-    EnableWindow(ctrl(kOaiUrl), !ollama);
-    EnableWindow(ctrl(kOaiKey), !ollama);
-    EnableWindow(ctrl(kOaiModel), !ollama);
+    EnableWindow(ctrl(kOaiProvider), cloud);
+    EnableWindow(ctrl(kOaiUrl), cloud);
+    EnableWindow(ctrl(kOaiKey), cloud);
+    EnableWindow(ctrl(kOaiModel), cloud);
+}
+
+void updateBuiltInStatus() {
+    if (!g.hwnd || !ctrl(kBuiltInDownload)) return;
+    const bool downloading = g.modelDownloadCancel != nullptr;
+    SetWindowTextW(ctrl(kBuiltInDownload), downloading ? L"Cancel download" :
+                   builtin::Installed() ? L"Model ready" : L"Download model · 2.49 GB");
+    EnableWindow(ctrl(kBuiltInDownload), downloading || !builtin::Installed());
+    if (!downloading)
+        SetWindowTextW(ctrl(kBuiltInStatus), builtin::Installed()
+            ? L"Ready for private offline translation · Faithful only"
+            : L"One-time download from Hugging Face; selected text stays on this PC.");
 }
 
 int cloudProviderIndex(const std::string& baseUrl) {
@@ -501,37 +525,44 @@ void buildPages() {
     {
     std::vector<HWND> controls = {
         makeLabel(L"PROVIDER", x, y, w, -1, true),
-        make(L"BUTTON", L"Local (Ollama) — private, offline", WS_TABSTOP | WS_GROUP | BS_AUTORADIOBUTTON,
-             x, y + 26, 300, 22, kBackendOllama),
-        makeLabel(L"Ollama model", x + 20, y + 58, 90, kOllamaModelLabel),
+        make(L"BUTTON", L"Built-in (Offline) — TranslateGemma 4B", WS_TABSTOP | WS_GROUP | BS_AUTORADIOBUTTON,
+             x, y + 26, 350, 22, kBackendBuiltIn),
+        make(L"BUTTON", L"Download model · 2.49 GB", WS_TABSTOP | BS_PUSHBUTTON,
+             x + 20, y + 52, 225, 30, kBuiltInDownload),
+        makeLabel(L"One-time download from Hugging Face; selected text stays on this PC.",
+                  x + 20, y + 87, w - 20, kBuiltInStatus),
+        make(L"BUTTON", L"Local (Ollama) — private, offline", WS_TABSTOP | BS_AUTORADIOBUTTON,
+             x, y + 120, 300, 22, kBackendOllama),
+        makeLabel(L"Ollama model", x + 20, y + 150, 90, kOllamaModelLabel),
         // 可编辑下拉框：列出已装模型，也允许手输
-        make(L"COMBOBOX", L"", WS_TABSTOP | CBS_DROPDOWN | WS_VSCROLL, x + 120, y + 54, 250, 240, kOllamaModel),
-        make(L"BUTTON", L"Refresh", WS_TABSTOP | BS_PUSHBUTTON, x + 380, y + 53, 80, 32, kOllamaRefresh),
+        make(L"COMBOBOX", L"", WS_TABSTOP | CBS_DROPDOWN | WS_VSCROLL, x + 120, y + 146, 250, 240, kOllamaModel),
+        make(L"BUTTON", L"Refresh", WS_TABSTOP | BS_PUSHBUTTON, x + 380, y + 145, 80, 32, kOllamaRefresh),
         makeLabel(L"Ollama at http://127.0.0.1:11434 — run `ollama serve` and pull a model first.",
-                  x + 20, y + 90, w - 20, kOllamaHint),
+                  x + 20, y + 179, w - 20, kOllamaHint),
         make(L"BUTTON", L"OpenAI-compatible API", WS_TABSTOP | BS_AUTORADIOBUTTON,
-             x, y + 128, 260, 22, kBackendOpenAI),
-        makeLabel(L"Provider", x + 20, y + 160, 90, kOaiProviderLabel),
-        make(L"COMBOBOX", L"", WS_TABSTOP | CBS_DROPDOWNLIST, x + 120, y + 156, 250, 180, kOaiProvider),
-        makeLabel(L"Base URL", x + 20, y + 198, 90, kOaiUrlLabel),
-        make(L"EDIT", L"", WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, x + 120, y + 194, 400, 32, kOaiUrl),
-        makeLabel(L"API key", x + 20, y + 236, 90, kOaiKeyLabel),
-        make(L"EDIT", L"", WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL | ES_PASSWORD, x + 120, y + 232, 400, 32, kOaiKey),
-        makeLabel(L"API model", x + 20, y + 274, 90, kOaiModelLabel),
-        make(L"EDIT", L"", WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, x + 120, y + 270, 280, 32, kOaiModel),
+             x, y + 209, 260, 22, kBackendOpenAI),
+        makeLabel(L"Provider", x + 20, y + 238, 90, kOaiProviderLabel),
+        make(L"COMBOBOX", L"", WS_TABSTOP | CBS_DROPDOWNLIST, x + 120, y + 234, 250, 180, kOaiProvider),
+        makeLabel(L"Base URL", x + 20, y + 272, 90, kOaiUrlLabel),
+        make(L"EDIT", L"", WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, x + 120, y + 268, 400, 30, kOaiUrl),
+        makeLabel(L"API key", x + 20, y + 306, 90, kOaiKeyLabel),
+        make(L"EDIT", L"", WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL | ES_PASSWORD, x + 120, y + 302, 400, 30, kOaiKey),
+        makeLabel(L"API model", x + 20, y + 340, 90, kOaiModelLabel),
+        make(L"EDIT", L"", WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, x + 120, y + 336, 280, 30, kOaiModel),
         makeLabel(L"API key is stored securely in Windows Credential Manager.",
-                  x + 20, y + 310, w - 20, kOaiHint),
+                  x + 20, y + 371, w - 20, kOaiHint),
         makeLabel(L"Privacy: triggered selections are sent to the configured cloud endpoint. "
-                  L"Use Ollama or exclude sensitive apps for private text.",
-                  x + 20, y + 338, w - 20, -1),
+                  L"Use a local backend or exclude sensitive apps for private text.",
+                  x + 20, y + 391, w - 20, kPrivacyHint),
         make(L"BUTTON", L"Test connection", WS_TABSTOP | BS_PUSHBUTTON,
-             x + 20, y + 386, 130, 30, kBackendTest),
+             x + 20, y + 422, 130, 30, kBackendTest),
         makeLabel(L"Uses fixed synthetic text, never your clipboard.",
-                  x + 165, y + 392, w - 165, kBackendStatus),
+                  x + 165, y + 428, w - 165, kBackendStatus),
     };
     g.pages[1].insert(g.pages[1].end(), controls.begin(), controls.end());
     }
-    CheckDlgButton(g.hwnd, s.backend == TranslationBackend::Ollama ? kBackendOllama : kBackendOpenAI, BST_CHECKED);
+    CheckDlgButton(g.hwnd, s.backend == TranslationBackend::BuiltIn ? kBackendBuiltIn
+                        : s.backend == TranslationBackend::Ollama ? kBackendOllama : kBackendOpenAI, BST_CHECKED);
     SetWindowTextW(ctrl(kOllamaModel), util::Widen(s.ollamaModel).c_str());
     SetWindowTextW(ctrl(kOaiUrl), util::Widen(s.openAIBaseURL).c_str());
     SetWindowTextW(ctrl(kOaiKey), util::Widen(s.openAIKey).c_str());
@@ -543,7 +574,9 @@ void buildPages() {
         SendMessageW(provider, CB_SETCURSEL, cloudProviderIndex(s.openAIBaseURL), 0);
     }
     updateBackendEnabled();
-    SetWindowPos(g.pages[1].back(), nullptr, px(x + 20), px(y + 338), px(w - 20), px(40), SWP_NOZORDER);
+    updateBuiltInStatus();
+    SetWindowPos(ctrl(kPrivacyHint), nullptr,
+                 px(x + 20), px(y + 391), px(w - 20), px(35), SWP_NOZORDER);
 
     // --- 2 Language ---
     y = 82;
@@ -754,10 +787,34 @@ void onCommand(int id, int code) {
         save = false;
         break;
 
+    case kBackendBuiltIn:
     case kBackendOllama:
     case kBackendOpenAI:
-        s.backend = id == kBackendOllama ? TranslationBackend::Ollama : TranslationBackend::OpenAI;
+        s.backend = id == kBackendBuiltIn ? TranslationBackend::BuiltIn
+                  : id == kBackendOllama ? TranslationBackend::Ollama : TranslationBackend::OpenAI;
         updateBackendEnabled();
+        break;
+    case kBuiltInDownload:
+        if (g.modelDownloadCancel) {
+            g.modelDownloadCancel->store(true);
+        } else if (!builtin::Installed()) {
+            auto cancel = std::make_shared<std::atomic<bool>>(false);
+            g.modelDownloadCancel = cancel;
+            updateBuiltInStatus();
+            HWND target = g.hwnd;
+            std::thread([cancel, target] {
+                std::wstring error;
+                auto send = [target](double fraction, const std::wstring& status, bool done) {
+                    auto* payload = new BuiltInProgress{fraction, status, done};
+                    if (!PostMessageW(target, kMsgBuiltInProgress, 0, (LPARAM)payload)) delete payload;
+                };
+                bool ok = builtin::Download(*cancel, [&](double fraction, const std::wstring& status) {
+                    send(fraction, status, false);
+                }, &error);
+                send(ok ? 1.0 : 0.0, ok ? L"Model ready for offline translation" : error, true);
+            }).detach();
+        }
+        save = false;
         break;
     case kOllamaModel:
         if (code == CBN_SELCHANGE) {
@@ -1110,6 +1167,21 @@ LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         delete result;
         return 0;
     }
+    case kMsgBuiltInProgress: {
+        auto* progress = reinterpret_cast<BuiltInProgress*>(lp);
+        if (progress->done) g.modelDownloadCancel.reset();
+        if (g.hwnd && ctrl(kBuiltInStatus)) {
+            std::wstring status = progress->status;
+            if (!progress->done) status += L" " + std::to_wstring(int(progress->fraction * 100)) + L"%";
+            SetWindowTextW(ctrl(kBuiltInStatus), status.c_str());
+            if (progress->done) {
+                updateBuiltInStatus();
+                if (!builtin::Installed()) SetWindowTextW(ctrl(kBuiltInStatus), status.c_str());
+            }
+        }
+        delete progress;
+        return 0;
+    }
     case WM_NOTIFY: {
         auto* hdr = (NMHDR*)lp;
         if (hdr->idFrom == kAboutLinks && (hdr->code == NM_CLICK || hdr->code == NM_RETURN)) {
@@ -1189,6 +1261,10 @@ LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         DestroyWindow(hwnd);
         return 0;
     case WM_DESTROY:
+        if (g.modelDownloadCancel) {
+            g.modelDownloadCancel->store(true);
+            g.modelDownloadCancel.reset();
+        }
         if (g.font) { DeleteObject(g.font); g.font = nullptr; }
         if (g.fontBold) { DeleteObject(g.fontBold); g.fontBold = nullptr; }
         if (g.fontTitle) { DeleteObject(g.fontTitle); g.fontTitle = nullptr; }

@@ -67,7 +67,9 @@ void Settings::load() {
     };
 
     enabled = boolean("enabled", enabled);
-    backend = str("backend", "ollama") == "openai" ? TranslationBackend::OpenAI : TranslationBackend::Ollama;
+    const std::string backendCode = str("backend", "builtin");
+    backend = backendCode == "builtin" ? TranslationBackend::BuiltIn
+            : backendCode == "openai" ? TranslationBackend::OpenAI : TranslationBackend::Ollama;
 
     ollamaHost = str("ollamaHost", ollamaHost);
     ollamaPort = root["ollamaPort"].isNull() ? ollamaPort : root["ollamaPort"].asInt(ollamaPort);
@@ -155,7 +157,8 @@ void Settings::load() {
 bool Settings::save() const {
     json::Object root;
     root["enabled"] = enabled;
-    root["backend"] = backend == TranslationBackend::OpenAI ? "openai" : "ollama";
+    root["backend"] = backend == TranslationBackend::BuiltIn ? "builtin"
+                    : backend == TranslationBackend::OpenAI ? "openai" : "ollama";
 
     root["ollamaHost"] = ollamaHost;
     root["ollamaPort"] = ollamaPort;

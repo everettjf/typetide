@@ -20,6 +20,9 @@ build\TypeTide.exe --selftest
   must capture, stream, replace, and restore the original clipboard.
 - With a real configured backend, `--selftest-translate` passes twice; the
   second result must match the cached first result.
+- Prepare the bundled runtime with `scripts\prepare-llama-runtime.ps1`, then
+  run `build\TypeTide.exe --selftest-builtin` for the opt-in 2.49 GB download
+  and bidirectional offline inference gate.
 
 ## Manual gates
 
@@ -40,6 +43,8 @@ build\TypeTide.exe --selftest
   fields, labels, popup, and title bar remain legible and update without restart.
 - Verify Ollama model discovery, missing-model auto-selection, preload, and a
   qwen3-family translation without a hidden-reasoning stall.
+- Verify the built-in download progress, cancellation, SHA-256 verification,
+  offline translation, Faithful-only style guard, and no Ollama process needed.
 - Verify one OpenAI-compatible SSE endpoint, including an invalid key and an
   unreachable host. Errors are visible and the main UI remains responsive.
 - Open Diagnostics: export valid JSON, confirm it contains no user text, URL,

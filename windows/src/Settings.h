@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-enum class TranslationBackend { Ollama, OpenAI };
+enum class TranslationBackend { BuiltIn, Ollama, OpenAI };
 
 /// 划词触发方式
 enum class SelectionTrigger {
@@ -38,7 +38,7 @@ struct Hotkey {
 
 struct Settings {
     bool enabled = true;
-    TranslationBackend backend = TranslationBackend::Ollama;
+    TranslationBackend backend = TranslationBackend::BuiltIn;
 
     // Ollama
     std::string ollamaHost = "http://127.0.0.1";

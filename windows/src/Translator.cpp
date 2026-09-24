@@ -1,4 +1,5 @@
 #include "Translator.h"
+#include "BuiltInModel.h"
 #include "Http.h"
 #include "Json.h"
 #include "LocalDiagnostics.h"
@@ -314,6 +315,22 @@ StreamOutcome runOpenAI(const TranslationRequest& req, const BackendConfig& s, u
     return out;
 }
 
+StreamOutcome runBuiltIn(const TranslationRequest& req, uint64_t id,
+                         const DeltaFn& onDelta, const std::atomic<bool>& cancel) {
+    StreamOutcome out;
+    out.ok = builtin::Stream(req, id, onDelta, cancel, &out.full, &out.error);
+    return out;
+}
+
+const char* backendName(TranslationBackend backend) {
+    switch (backend) {
+    case TranslationBackend::BuiltIn: return "builtin-translategemma-q4km";
+    case TranslationBackend::OpenAI: return "openai";
+    case TranslationBackend::Ollama: return "ollama";
+    }
+    return "unknown";
+}
+
 } // namespace
 
 std::string SystemPrompt(Language target, std::optional<Language> source, RewriteStyle style) {
@@ -350,12 +367,13 @@ uint64_t Stream(const TranslationRequest& req, DeltaFn onDelta, DoneFn onDone) {
     BackendConfig cfg = BackendConfig::snapshot();
 
     // 缓存命中：同步回调全文
-    std::string key = cacheKey(req, cfg.backend == TranslationBackend::OpenAI ? "openai" : "ollama");
+    const char* provider = backendName(cfg.backend);
+    std::string key = cacheKey(req, provider);
     if (auto cached = Cache::shared().get(key)) {
         onDelta(id, *cached);
         onDone(id, true, L"");
         diagnostics::Record("translation", "cacheHit",
-                            cfg.backend == TranslationBackend::OpenAI ? "openai" : "ollama",
+                            provider,
                             {}, {}, 0, 0, (int)req.text.size());
         return id;
     }
@@ -373,7 +391,9 @@ uint64_t Stream(const TranslationRequest& req, DeltaFn onDelta, DoneFn onDone) {
             if (!delta.empty() && !firstToken) firstToken = std::chrono::steady_clock::now();
             onDelta(requestId, delta);
         };
-        StreamOutcome out = cfg.backend == TranslationBackend::OpenAI
+        StreamOutcome out = cfg.backend == TranslationBackend::BuiltIn
+                                ? runBuiltIn(req, id, trackedDelta, *cancel)
+                            : cfg.backend == TranslationBackend::OpenAI
                                 ? runOpenAI(req, cfg, id, trackedDelta, *cancel)
                                 : runOllama(req, cfg, id, trackedDelta, *cancel);
         bool cancelled = cancel->load();
@@ -383,7 +403,7 @@ uint64_t Stream(const TranslationRequest& req, DeltaFn onDelta, DoneFn onDone) {
         const int firstMs = firstToken
             ? (int)std::chrono::duration_cast<std::chrono::milliseconds>(*firstToken - start).count()
             : -1;
-        const char* backend = cfg.backend == TranslationBackend::OpenAI ? "openai" : "ollama";
+        const char* backend = backendName(cfg.backend);
         if (cancelled) {
             diagnostics::Record("translation", "cancelled", backend, {}, "cancelled",
                                 firstMs, totalMs, (int)req.text.size());
@@ -460,7 +480,7 @@ void CheckHealthAsync(std::function<void(HealthCheckResult)> completion) {
         std::optional<std::chrono::steady_clock::time_point> first;
     };
     auto state = std::make_shared<State>();
-    const std::string backend = Settings::shared().backend == TranslationBackend::OpenAI ? "openai" : "ollama";
+    const std::string backend = backendName(Settings::shared().backend);
     Stream(
         {L"TypeTide health check " + std::to_wstring(stamp), Language::English,
          Language::Chinese, RewriteStyle::Faithful},

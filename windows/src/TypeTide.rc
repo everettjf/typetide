@@ -4,8 +4,8 @@
 IDI_APPICON ICON "..\\assets\\app.ico"
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,15,0
- PRODUCTVERSION 0,1,15,0
+ FILEVERSION 0,1,16,0
+ PRODUCTVERSION 0,1,16,0
  FILEFLAGSMASK 0x3fL
  FILEFLAGS 0x0L
  FILEOS VOS_NT_WINDOWS32
@@ -18,12 +18,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "everettjf"
             VALUE "FileDescription", "TypeTide — system-wide AI translation & inline rewrite"
-            VALUE "FileVersion", "0.1.15"
+            VALUE "FileVersion", "0.1.16"
             VALUE "InternalName", "TypeTide"
             VALUE "LegalCopyright", "MIT License"
             VALUE "OriginalFilename", "TypeTide.exe"
             VALUE "ProductName", "TypeTide"
-            VALUE "ProductVersion", "0.1.15"
+            VALUE "ProductVersion", "0.1.16"
         END
     END
     BLOCK "VarFileInfo"
