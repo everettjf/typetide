@@ -1,8 +1,8 @@
 # TypeTide for Windows
 
 Native Win32 C++20 port of TypeTide — system-wide AI translation & inline
-rewrite. Zero third-party dependencies: WinHTTP for networking, UI Automation
-for selection capture, a tiny built-in JSON parser. No Electron, no runtime.
+rewrite. WinHTTP handles networking, UI Automation captures selections, and a
+bundled llama.cpp CPU runtime powers the built-in model. No Electron.
 
 ## Feature parity with macOS
 
@@ -12,7 +12,7 @@ for selection capture, a tiny built-in JSON parser. No Electron, no runtime.
 | Write · rewrite in place | ⌥R | Alt+R |
 | Selection capture | AX API → clipboard fallback | UI Automation TextPattern → clipboard fallback |
 | Undo-safe replace | synthetic ⌘V | synthetic Ctrl+V |
-| Backends | Ollama · OpenAI-compatible (streaming) | same |
+| Backends | Built-in TranslateGemma · Ollama · OpenAI-compatible | same |
 | Ollama model picker / auto-resolve | ✅ | ✅ (dropdown from /api/tags; invalid model auto-replaced at startup) |
 | Floating icon / auto-translate on select | ✅ | ✅ (low-level mouse hook) |
 | Retarget language in popup | ✅ | ✅ |
@@ -133,3 +133,19 @@ otherwise a 2-second translation silently burns minutes on hidden reasoning.
   at the cursor instead of the selection.
 - `RegisterHotKey` fails if another app owns the combo; TypeTide warns once and
   you can pick a different shortcut in Settings → Shortcuts.
+# Built-in offline translation
+
+On a fresh install, the Translation tab offers TranslateGemma 4B as the default backend.
+Click **Download model** once (2.49 GB). TypeTide checks the pinned GGUF file's
+size and SHA-256 before enabling inference. Selected text stays on the PC; only
+the model download contacts Hugging Face. The bundled CPU llama.cpp runtime is
+started on loopback when needed and requires no Ollama installation or account.
+The built-in model supports Faithful translation and Replace; choose Ollama or
+an OpenAI-compatible backend for Formal, Casual, and Polished styles. CPU-only
+inference may be slow on older hardware.
+
+The release script downloads and verifies a pinned llama.cpp Windows CPU
+archive and packages `build/llama/` beside `TypeTide.exe`. Development builds
+can prepare it with `scripts/prepare-llama-runtime.ps1`. The opt-in live gate
+`build/TypeTide.exe --selftest-builtin` downloads the model if needed and runs
+Chinese→English and English→Chinese translations.

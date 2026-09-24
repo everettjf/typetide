@@ -52,6 +52,9 @@ $st = Start-Process -FilePath $exe -ArgumentList "--selftest" -NoNewWindow -Wait
 if ($st.ExitCode -ne 0) { throw "self-test failed (exit $($st.ExitCode))" }
 Remove-Item Env:\TYPETIDE_DATA_DIR
 
+# The built-in offline backend ships its CPU inference runtime with the app.
+& (Join-Path $win "scripts\prepare-llama-runtime.ps1")
+
 # --- 安装包 ---
 & $iscc "/DAppVersion=$version" (Join-Path $win "installer\TypeTide.iss") | Select-Object -Last 3
 if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
@@ -60,7 +63,7 @@ $setup = Join-Path $win "build\TypeTide-Setup-$version.exe"
 # --- 便携 zip ---
 $zip = Join-Path $win "build\TypeTide-Windows-$version.zip"
 if (Test-Path $zip) { Remove-Item $zip }
-Compress-Archive -Path $exe -DestinationPath $zip
+Compress-Archive -Path $exe, (Join-Path $win "build\llama") -DestinationPath $zip
 
 Write-Output ""
 Write-Output "artifacts:"
