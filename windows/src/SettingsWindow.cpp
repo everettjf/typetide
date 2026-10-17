@@ -1055,8 +1055,8 @@ void onCommand(int id, int code) {
         s.rewriteShortcutAction = (ShortcutAction)SendMessageW(ctrl(kRewriteAction), CB_GETCURSEL, 0, 0);
         break;
     case kHkRestoreDefaults:
-        s.readShortcut = {MOD_ALT, 'D'};
-        s.rewriteShortcut = {MOD_ALT, 'R'};
+        s.readShortcut = kDefaultReadShortcut;
+        s.rewriteShortcut = kDefaultRewriteShortcut;
         s.readShortcutAction = ShortcutAction::SmartPopup;
         s.rewriteShortcutAction = ShortcutAction::SmartReplace;
         SendMessageW(ctrl(kHkRead), HKM_SETHOTKEY, hotkeyToControl(s.readShortcut), 0);

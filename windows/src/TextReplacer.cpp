@@ -53,12 +53,19 @@ LRESULT CALLBACK ownerProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 /// 工作线程主体：设置延迟渲染剪贴板 → 合成粘贴 → 等目标取数据 → 还原剪贴板
 void replaceWorker(const std::wstring& text, bool selectAll) {
     DWORD started = GetTickCount();
-    // Also guard shortcut-driven replacement while a mouse button is held.
-    // A timeout must cancel, never inject into an unfinished click.
+    // Wait for the triggering gesture to finish. With a fast/cached result,
+    // Ctrl+Shift+R can still be held when paste starts; its later key-up
+    // events can interfere with the synthetic Ctrl+V.
+    auto gestureHeld = [] {
+        const int keys[] = {VK_LBUTTON, VK_CONTROL, VK_MENU, VK_SHIFT, VK_LWIN, VK_RWIN};
+        for (int key : keys)
+            if (GetAsyncKeyState(key) & 0x8000) return true;
+        return false;
+    };
     DWORD mouseDeadline = GetTickCount() + 2000;
-    while (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
+    while (gestureHeld()) {
         if (GetTickCount() >= mouseDeadline) {
-            diagnostics::Record("replacement", "failure", {}, {}, "mouseStillPressed",
+            diagnostics::Record("replacement", "failure", {}, {}, "triggerStillPressed",
                                 -1, (int)(GetTickCount() - started), (int)text.size());
             return;
         }

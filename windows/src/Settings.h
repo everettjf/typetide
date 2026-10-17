@@ -36,6 +36,9 @@ struct Hotkey {
     bool operator==(const Hotkey&) const = default;
 };
 
+inline constexpr Hotkey kDefaultReadShortcut{MOD_ALT, 'D'};
+inline constexpr Hotkey kDefaultRewriteShortcut{MOD_CONTROL | MOD_SHIFT, 'R'};
+
 struct Settings {
     bool enabled = true;
     TranslationBackend backend = TranslationBackend::BuiltIn;
@@ -57,8 +60,8 @@ struct Settings {
     TranslationDirection rewriteDirection = TranslationDirection::Auto;
 
     // 快捷键
-    Hotkey readShortcut{MOD_ALT, 'D'};
-    Hotkey rewriteShortcut{MOD_ALT, 'R'};
+    Hotkey readShortcut = kDefaultReadShortcut;
+    Hotkey rewriteShortcut = kDefaultRewriteShortcut;
     ShortcutAction readShortcutAction = ShortcutAction::SmartPopup;
     ShortcutAction rewriteShortcutAction = ShortcutAction::SmartReplace;
 

@@ -26,7 +26,7 @@ TypeTide 把翻译变成一个原地完成的系统动作。它常驻菜单栏�
 
 <p align="center">
   <img src="docs/screenshots/rewrite.gif" alt="输入中文，按下改写快捷键，原地改写为英文" width="760" />
-  <br/><sub><i>写 · 用母语输入，在 macOS 按 <kbd>⌥R</kbd>，或在 Windows 按 <kbd>Alt+R</kbd>，原地改写成目标语言。</i></sub>
+  <br/><sub><i>写 · 用母语输入，在 macOS 按 <kbd>⌥R</kbd>，或在 Windows 按 <kbd>Ctrl+Shift+R</kbd>，原地改写成目标语言。</i></sub>
 </p>
 
 <p align="center">
@@ -70,7 +70,7 @@ TypeTide 把翻译变成一个原地完成的系统动作。它常驻菜单栏�
 
 macOS 和 Windows 使用完全相同的 10 种检测与翻译语言：**English（英语，`en`）、中文（`zh`）、हिन्दी（印地语，`hi`）、Español（西班牙语，`es`）、Français（法语，`fr`）、العربية（阿拉伯语，`ar`）、বাংলা（孟加拉语，`bn`）、Русский（俄语，`ru`）、Português（葡萄牙语，`pt`）、Bahasa Indonesia（印尼语，`id`）**。
 
-在**设置 → Language** 里选好你的母语和外语。读/写快捷键（macOS 为 `⌥D / ⌥R`，Windows 为 `Alt+D / Alt+R`）各有独立方向：**自动**检测选中文字的语言并翻译成另一种，混合语言容易误判时也可以钉死**固定**方向。
+在**设置 → Language** 里选好你的母语和外语。读/写快捷键（macOS 为 `⌥D / ⌥R`，Windows 为 `Alt+D / Ctrl+Shift+R`）各有独立方向：**自动**检测选中文字的语言并翻译成另一种，混合语言容易误判时也可以钉死**固定**方向。
 
 ## 🚀 快速开始
 
@@ -103,7 +103,7 @@ TypeTide 会在**设置 → Backend** 里列出你已安装的模型；配置的
 macOS：在**系统设置 → 隐私与安全性 → 辅助功能**里允许 TypeTide（读取选区和替换文字需要）。若列表里没有 TypeTide，点击应用中的 **Show Current App**，将显示的当前应用拖入权限列表并开启；若旧副本授权失效，移除旧条目后重新添加。权限状态会自动刷新。Windows 无需任何特殊权限。然后：
 
 - 选中文字 → **⌥D**（macOS）/ **Alt+D**（Windows）→ 看译文。
-- 用母语输入 → **⌥R** / **Alt+R** → 原地改写。
+- 用母语输入 → **⌥R** / **Ctrl+Shift+R** → 原地改写。
 
 快捷键及其动作、触发方式、风格、语言都可以在**设置**里改；Windows 组合键也可以加入 Windows 键。可用**测试连接**和**验证快捷键**在正式使用前确认整条链路。
 

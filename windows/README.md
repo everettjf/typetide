@@ -9,7 +9,7 @@ bundled llama.cpp CPU runtime powers the built-in model. No Electron.
 | | macOS | Windows |
 |---|---|---|
 | Read · translate selection | ⌥D → popup | Alt+D → popup |
-| Write · rewrite in place | ⌥R | Alt+R |
+| Write · rewrite in place | ⌥R | Ctrl+Shift+R |
 | Selection capture | AX API → clipboard fallback | UI Automation TextPattern → clipboard fallback |
 | Undo-safe replace | synthetic ⌘V | synthetic Ctrl+V |
 | Backends | Built-in TranslateGemma · Ollama · OpenAI-compatible | same |

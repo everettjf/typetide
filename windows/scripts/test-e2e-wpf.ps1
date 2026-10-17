@@ -107,10 +107,10 @@ if ($popup -ne [IntPtr]::Zero) {
 Send-Combo @() $VK_ESCAPE
 Start-Sleep -Milliseconds 800
 
-Write-Output "[wpf] Alt+R → rewrite (selection persists in WPF)"
+Write-Output "[wpf] Ctrl+Shift+R → rewrite (selection persists in WPF)"
 Ensure-Foreground $hostHwnd | Out-Null
 Start-Sleep -Milliseconds 300
-Send-Combo @($VK_MENU) 0x52
+Send-Combo @(0x11, 0x10) 0x52
 
 $content = ""
 for ($i = 0; $i -lt 120; $i++) {

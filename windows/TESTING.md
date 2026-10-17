@@ -29,14 +29,14 @@ build\TypeTide.exe --selftest
 - Fresh launch stays in first-run mode until **Test connection** succeeds and
   **Verify shortcuts** confirms at least one configured shortcut and every
   configured shortcut is registered.
-- Defaults are `Alt+D` (smart popup) and `Alt+R` (smart replace). Exercise all
+- Defaults are `Alt+D` (smart popup) and `Ctrl+Shift+R` (smart replace). Exercise all
   six action choices: smart/native/foreign × popup/replace, plus at least one
   combination that includes the Windows key.
 - Assign the same combination to both shortcuts: the UI rejects it. Reserve a
   shortcut in another app: TypeTide reports it unavailable without crashing.
 - Clear either shortcut: the other still works and verification succeeds. Clear
   both: neither is registered, verification warns that at least one is required,
-  and restoring defaults brings back Alt+D / Alt+R.
+  and restoring defaults brings back Alt+D / Ctrl+Shift+R.
 - Test Notepad, a Chromium/Electron app, a WPF app, and a browser text field.
   Confirm Copy, Replace, Escape/click-outside cancellation, and Ctrl+Z undo.
 - Switch Windows between light and dark mode while Settings is open. Navigation,

@@ -31,7 +31,7 @@ No browser tab and no copy-paste loop. On Apple Silicon Macs, translation defaul
 
 <p align="center">
   <img src="docs/screenshots/rewrite.gif" alt="Type Chinese, press the rewrite shortcut, and it is rewritten into English in place" width="760" />
-  <br/><sub><i>Write · type in your language, press <kbd>⌥R</kbd> on macOS or <kbd>Alt+R</kbd> on Windows, and it’s rewritten in place.</i></sub>
+  <br/><sub><i>Write · type in your language, press <kbd>⌥R</kbd> on macOS or <kbd>Ctrl+Shift+R</kbd> on Windows, and it’s rewritten in place.</i></sub>
 </p>
 
 <p align="center">
@@ -75,7 +75,7 @@ No browser tab and no copy-paste loop. On Apple Silicon Macs, translation defaul
 
 Detection and translation use the same 10-language set on macOS and Windows: **English (`en`), 中文 (`zh`), हिन्दी (`hi`), Español (`es`), Français (`fr`), العربية (`ar`), বাংলা (`bn`), Русский (`ru`), Português (`pt`), and Bahasa Indonesia (`id`)**.
 
-Pick your native and foreign language in **Settings → Language**. Each Read/Write shortcut (`⌥D / ⌥R` on macOS, `Alt+D / Alt+R` on Windows) has its own direction: **auto** detects the selected text's language and translates the other way, or pin a **fixed** direction for mixed-language text.
+Pick your native and foreign language in **Settings → Language**. Each Read/Write shortcut (`⌥D / ⌥R` on macOS, `Alt+D / Ctrl+Shift+R` on Windows) has its own direction: **auto** detects the selected text's language and translates the other way, or pin a **fixed** direction for mixed-language text.
 
 ## 🚀 Quick start
 
@@ -110,7 +110,7 @@ TypeTide lists your installed models in **Settings → Backend** and auto-picks 
 macOS: allow TypeTide under **System Settings → Privacy & Security → Accessibility** (required to read selections and replace text). If TypeTide is missing, click **Show Current App** in setup and drag that copy into the permission list, then enable it. If an older copy has a stale grant, remove its entry and add the current copy again. Permission status refreshes automatically. Windows needs no special permission. Then:
 
 - Select text → **⌥D** (macOS) / **Alt+D** (Windows) → see the translation.
-- Type in your language → **⌥R** / **Alt+R** → it’s rewritten in place.
+- Type in your language → **⌥R** / **Ctrl+Shift+R** → it’s rewritten in place.
 
 Shortcuts, their actions, triggers, styles, and languages are all configurable in **Settings**. Either shortcut can be cleared completely; keep at least one configured if you want keyboard triggering. Windows combinations may also include the Windows key. Use **Test Connection** and **Verify Shortcuts** to confirm the complete path before relying on it.
 

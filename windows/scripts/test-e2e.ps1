@@ -1,12 +1,13 @@
 ﻿# 端到端冒烟测试：真实驱动 TypeTide.exe + 自建编辑窗口 + mock 后端。
 # 前置：mock-openai.ps1 已在 8199 端口运行；TYPETIDE_DATA_DIR 指向含
-# openai/8199 配置的测试目录（Alt+D 读、Alt+R 写、rewritePreview=false）。
+# openai/8199 配置的测试目录（Alt+D 读、Ctrl+Shift+R 写、rewritePreview=false）。
 param(
     [string]$Exe = "$PSScriptRoot\..\build\TypeTide.exe",
     [string]$Expected = "MOCK_TRANSLATION_OK",
     [switch]$Real,   # 真实模型：不比对固定译文，轮询等待并做宽松断言
     [byte]$ReadKey = 0x44,
-    [byte]$RewriteKey = 0x52
+    [byte]$RewriteKey = 0x52,
+    [byte[]]$RewriteModifiers = @(0x11, 0x10)
 )
 $ErrorActionPreference = "Stop"
 
@@ -148,12 +149,12 @@ if ($popup -ne [IntPtr]::Zero) {
     [Win]::SendMessageW($editHwnd, 0x000C, [IntPtr]::Zero, $sb) | Out-Null
 }
 
-Write-Output "[e2e] Alt+R → rewrite in place"
+Write-Output "[e2e] rewrite shortcut → replace in place"
 Ensure-Foreground $hostHwnd | Out-Null
 Start-Sleep -Milliseconds 300
 [Win]::SendMessageInt($editHwnd, 0x00B1, [IntPtr]::Zero, [IntPtr](-1)) | Out-Null   # EM_SETSEL 全选
 Start-Sleep -Milliseconds 300
-Send-Combo @($VK_MENU) $RewriteKey
+Send-Combo $RewriteModifiers $RewriteKey
 
 # 轮询等内容被替换
 $content = ""
