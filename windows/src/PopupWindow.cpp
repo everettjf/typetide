@@ -56,6 +56,8 @@ void PopupWindow::show(const std::wstring& original, Language target, RECT ancho
     animationsEnabled_ = clientAnimations == TRUE;
     scrollY_ = 0;
     target_ = target;
+    source_.reset();
+    onSourceChange = nullptr;
     anchor_ = anchor;
     showReplace_ = showReplace;
     hover_ = Region::None;
@@ -145,6 +147,12 @@ void PopupWindow::setTarget(Language target) {
     if (hwnd_) InvalidateRect(hwnd_, nullptr, TRUE);
 }
 
+void PopupWindow::selectSource(Language source) {
+    if (!hwnd_ || !onSourceChange) return;
+    source_ = source;
+    onSourceChange(source);
+}
+
 void PopupWindow::resetForRetranslate() {
     if (!hwnd_) return;
     translation_.clear();
@@ -230,9 +238,12 @@ void PopupWindow::layoutAndResize() {
     int btnY = height - padY - btnH;
     int replaceW = showReplace_ ? px(84) : 0;
     int copyW = px(70);
+    rcSource_ = {};
     if (!error_.empty() && onRetry) {
         rcCopy_ = rcReplace_ = RECT{};
         rcRetry_ = {width - padX - px(76), btnY, width - padX, btnY + btnH};
+        if (onSourceChange)
+            rcSource_ = {padX, btnY, rcRetry_.left - px(12), btnY + btnH};
     } else if (hasButtons) {
         rcRetry_ = {};
         int x = width - padX;
@@ -446,6 +457,11 @@ void PopupWindow::paint(HDC dc) {
         drawButton(rcCopy_, copiedFlash_ ? L"Copied ✓" : L"Copy", false, hover_ == Region::Copy);
         if (showReplace_) drawButton(rcReplace_, L"Replace", true, hover_ == Region::Replace);
     }
+    if (!error_.empty() && onSourceChange && rcSource_.right > rcSource_.left) {
+        std::wstring label = source_ ? L"Source: " + std::wstring(lang::DisplayName(*source_)) + L" ▾"
+                                     : L"Source language… ▾";
+        drawButton(rcSource_, label.c_str(), false, hover_ == Region::Source);
+    }
     if (!error_.empty() && onRetry)
         drawButton(rcRetry_, L"Retry", true, hover_ == Region::Retry);
 }
@@ -453,22 +469,24 @@ void PopupWindow::paint(HDC dc) {
 PopupWindow::Region PopupWindow::hitTest(POINT pt) const {
     if (PtInRect(&rcClose_, pt)) return Region::Close;
     if (PtInRect(&rcLang_, pt)) return Region::Lang;
+    if (rcSource_.right > rcSource_.left && PtInRect(&rcSource_, pt)) return Region::Source;
     if (rcCopy_.right > rcCopy_.left && PtInRect(&rcCopy_, pt)) return Region::Copy;
     if (showReplace_ && rcReplace_.right > rcReplace_.left && PtInRect(&rcReplace_, pt)) return Region::Replace;
     if (rcRetry_.right > rcRetry_.left && PtInRect(&rcRetry_, pt)) return Region::Retry;
     return Region::None;
 }
 
-void PopupWindow::showLangMenu() {
+void PopupWindow::showLangMenu(bool source) {
     HMENU menu = CreatePopupMenu();
     for (size_t i = 0; i < std::size(lang::All); ++i) {
         UINT flags = MF_STRING;
-        if (lang::All[i] == target_) flags |= MF_CHECKED;
+        if (source ? source_ == lang::All[i] : lang::All[i] == target_) flags |= MF_CHECKED;
         AppendMenuW(menu, flags, 100 + i, lang::DisplayName(lang::All[i]));
     }
     RECT wr{};
     GetWindowRect(hwnd_, &wr);
-    POINT at{wr.left + rcLang_.left, wr.top + rcLang_.bottom};
+    const RECT& trigger = source ? rcSource_ : rcLang_;
+    POINT at{wr.left + trigger.left, wr.top + trigger.bottom};
 
     // TrackPopupMenu 需要前台窗口才能正常关闭；记录并恢复原前台，
     // 保证 Replace 仍粘贴回目标应用。
@@ -483,7 +501,9 @@ void PopupWindow::showLangMenu() {
 
     if (cmd >= 100 && cmd < 100 + std::size(lang::All)) {
         Language chosen = lang::All[cmd - 100];
-        if (chosen != target_ && onRetarget) onRetarget(chosen);
+        if (source) {
+            selectSource(chosen);
+        } else if (chosen != target_ && onRetarget) onRetarget(chosen);
     }
 }
 
@@ -561,6 +581,9 @@ LRESULT PopupWindow::handle(UINT msg, WPARAM wp, LPARAM lp) {
             return 0;
         case Region::Lang:
             showLangMenu();
+            return 0;
+        case Region::Source:
+            showLangMenu(true);
             return 0;
         case Region::Copy:
             if (!translation_.empty()) {

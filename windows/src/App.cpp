@@ -284,6 +284,13 @@ void App::presentRead(const capture::Capture& cap, std::optional<Language> targe
 
     PopupWindow& popup = PopupWindow::shared();
     popup.show(cap.text, dir.to, anchor, /*showReplace=*/true);
+    configurePopupCallbacks();
+    startStream(cap.text, dir.from, dir.to, s.readStyle);
+}
+
+void App::configurePopupCallbacks() {
+    auto& popup = PopupWindow::shared();
+    popup.setSource(currentSource_);
     popup.onReplace = [this] {
         std::wstring t = PopupWindow::shared().translation();
         if (util::Trim(t).empty()) return;
@@ -303,9 +310,15 @@ void App::presentRead(const capture::Capture& cap, std::optional<Language> targe
         p.resetForRetranslate();
         startStream(currentText_, currentSource_, p.target(), currentStyle_);
     };
+    popup.onSourceChange = [this](Language source) {
+        translator::Cancel(currentReq_);
+        currentSource_ = source;
+        auto& p = PopupWindow::shared();
+        p.setSource(source);
+        p.resetForRetranslate();
+        startStream(currentText_, source, p.target(), currentStyle_);
+    };
     popup.onClosed = [this] { translator::Cancel(currentReq_); };
-
-    startStream(cap.text, dir.from, dir.to, s.readStyle);
 }
 
 void App::startStream(const std::wstring& text, std::optional<Language> from, Language to, RewriteStyle style) {
@@ -373,26 +386,7 @@ void App::proceedRewrite(const capture::Capture& capIn, std::optional<Language> 
 
         PopupWindow& popup = PopupWindow::shared();
         popup.show(cap->text, dir.to, anchor, /*showReplace=*/true);
-        popup.onReplace = [this] {
-            std::wstring t = PopupWindow::shared().translation();
-            if (util::Trim(t).empty()) return;
-            bool selectAll = currentReplaceSelectAll_;
-            PopupWindow::shared().close();
-            replacer::ReplaceAsync(std::move(t), selectAll);
-        };
-        popup.onRetarget = [this](Language newTarget) {
-            translator::Cancel(currentReq_);
-            PopupWindow& p = PopupWindow::shared();
-            p.setTarget(newTarget);
-            p.resetForRetranslate();
-            startStream(currentText_, currentSource_, newTarget, currentStyle_);
-        };
-        popup.onRetry = [this] {
-            PopupWindow& p = PopupWindow::shared();
-            p.resetForRetranslate();
-            startStream(currentText_, currentSource_, p.target(), currentStyle_);
-        };
-        popup.onClosed = [this] { translator::Cancel(currentReq_); };
+        configurePopupCallbacks();
 
         startStream(cap->text, dir.from, dir.to, s.rewriteStyle);
     } else {
@@ -412,7 +406,7 @@ void App::proceedRewrite(const capture::Capture& capIn, std::optional<Language> 
                 std::lock_guard lock(state->mutex);
                 state->result += delta;
             },
-            [hwnd, state, c, d](uint64_t, bool ok, const std::wstring& error) {
+            [hwnd, state, c, d, style](uint64_t, bool ok, const std::wstring& error) {
                 std::lock_guard lock(state->mutex);
                 std::wstring cleaned = util::Trim(state->result);
                 const bool emptyResponse = ok && cleaned.empty();
@@ -425,6 +419,8 @@ void App::proceedRewrite(const capture::Capture& capIn, std::optional<Language> 
                     true,
                     c.text,
                     d.to,
+                    d.from,
+                    style,
                 };
                 if (!PostMessageW(hwnd, WM_APP_REWRITE_DONE, 0, (LPARAM)msg)) delete msg;
             });
@@ -485,8 +481,16 @@ LRESULT App::handle(UINT msg, WPARAM wp, LPARAM lp) {
         auto* r = (RewriteResult*)lp;
         if (r->ok)
             replacer::ReplaceAsync(std::move(r->text), r->isWholeField);
-        else
-            showErrorPopup(r->original, r->target, r->anchor, r->error);
+        else {
+            currentText_ = r->original;
+            currentSource_ = r->source;
+            currentStyle_ = r->style;
+            currentReplaceSelectAll_ = r->isWholeField;
+            auto& popup = PopupWindow::shared();
+            popup.show(r->original, r->target, r->anchor, true);
+            configurePopupCallbacks();
+            popup.setError(r->error);
+        }
         delete r;
         return 0;
     }

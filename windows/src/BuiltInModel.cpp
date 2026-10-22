@@ -178,7 +178,7 @@ std::string promptFor(const TranslationRequest& request, std::wstring* error) {
     }
     auto source = request.source ? request.source : lang::Detect(request.text);
     if (!source) {
-        *error = L"Source language is unclear. Choose a fixed translation direction in Languages.";
+        *error = L"Source language is unclear. Choose a source language below to translate again.";
         return {};
     }
     std::string from = lang::PromptName(*source), to = lang::PromptName(request.target);

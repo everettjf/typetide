@@ -7,6 +7,7 @@
 #include "Language.h"
 #include <functional>
 #include <string>
+#include <optional>
 
 class PopupWindow {
 public:
@@ -21,6 +22,9 @@ public:
     void finishTranslation();
     void setError(const std::wstring& error);
     void setTarget(Language target);
+    void setSource(std::optional<Language> source) { source_ = source; }
+    std::optional<Language> source() const { return source_; }
+    void selectSource(Language source);
     /// 重新进入 loading（重定向语言后重新翻译）
     void resetForRetranslate();
 
@@ -33,6 +37,8 @@ public:
     std::function<void()> onReplace;
     /// 弹窗里改选目标语言
     std::function<void(Language)> onRetarget;
+    /// Choose a source language for this request, without changing settings.
+    std::function<void(Language)> onSourceChange;
     /// 错误状态下重试当前请求
     std::function<void()> onRetry;
     /// 弹窗关闭（App 取消未完成的流）
@@ -43,12 +49,12 @@ private:
     static LRESULT CALLBACK wndProc(HWND, UINT, WPARAM, LPARAM);
     LRESULT handle(UINT msg, WPARAM wp, LPARAM lp);
 
-    enum class Region { None, Close, Lang, Copy, Replace, Retry };
+    enum class Region { None, Close, Lang, Source, Copy, Replace, Retry };
 
     void layoutAndResize();
     void paint(HDC dc);
     Region hitTest(POINT pt) const;
-    void showLangMenu();
+    void showLangMenu(bool source = false);
     void installDismissMonitors();
     void removeDismissMonitors();
     void updateFonts();
@@ -66,6 +72,7 @@ private:
     std::wstring error_;
     bool loading_ = true;
     Language target_ = Language::English;
+    std::optional<Language> source_;
     bool copiedFlash_ = false;
     enum class TidePhase { Waiting, Flowing, Settling, Complete, Failed };
     TidePhase tidePhase_ = TidePhase::Waiting;
@@ -82,7 +89,7 @@ private:
     bool trackingMouse_ = false;
     bool menuOpen_ = false;
 
-    RECT rcClose_{}, rcLang_{}, rcCopy_{}, rcReplace_{}, rcRetry_{};
+    RECT rcClose_{}, rcLang_{}, rcSource_{}, rcCopy_{}, rcReplace_{}, rcRetry_{};
     HFONT fontHeader_ = nullptr, fontBody_ = nullptr, fontSmall_ = nullptr;
 
     int mouseHookId_ = 0, keyHookId_ = 0;

@@ -56,6 +56,8 @@ private:
         bool hasAnchor;
         std::wstring original;
         Language target;
+        std::optional<Language> source;
+        RewriteStyle style;
     };
     struct Direction {
         std::optional<Language> from;
@@ -71,6 +73,7 @@ private:
     bool rejectIfTooLong(const capture::Capture& cap);
     Direction resolveDirection(const std::wstring& text, TranslationDirection mode, bool isWrite) const;
     void startStream(const std::wstring& text, std::optional<Language> from, Language to, RewriteStyle style);
+    void configurePopupCallbacks();
     void setupSelectionTrigger();
     bool foregroundAppSkipped() const;
     void showErrorPopup(const std::wstring& original, Language target, RECT anchor, const std::wstring& error);
