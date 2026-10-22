@@ -13,6 +13,6 @@ void open(HWND appWindow, bool showShortcuts = false);
 void refreshShortcutStatus();
 
 /// Self-test: verify all navigation icons retain the requested theme color.
-bool testNavigationIconColors(bool dark);
+bool testNavigationIconColors(bool dark, UINT dpi = 96);
 
 } // namespace SettingsWindow

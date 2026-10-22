@@ -266,7 +266,7 @@ HWND ctrl(int id) { return GetDlgItem(g.hwnd, id); }
 
 HIMAGELIST createTabImages() {
     const int size = px(16);
-    HIMAGELIST images = ImageList_Create(size, size, ILC_COLOR24 | ILC_MASK, 8, 0);
+    HIMAGELIST images = ImageList_Create(size, size, ILC_COLOR32, 8, 0);
     HDC dc = CreateCompatibleDC(nullptr);
     BITMAPINFO info{};
     info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -339,10 +339,17 @@ HIMAGELIST createTabImages() {
             MoveToEx(dc, p(8), p(7), nullptr); LineTo(dc, p(8), p(12));
             break;
         }
-        // Preserve the theme-colored strokes. A monochrome CreateIcon with
-        // an all-zero XOR mask turns every visible stroke black in all themes.
+        // GDI draws RGB with no alpha. Convert the drawing's background to
+        // transparent pixels and its theme-colored strokes to opaque pixels.
+        // Avoid color-key masks: they leaked magenta tiles on dark navigation.
         GdiFlush();
-        ImageList_AddMasked(images, bitmap, RGB(255, 0, 255));
+        for (int pixel = 0; pixel < size * size; ++pixel) {
+            DWORD rgb = pixels[pixel] & 0x00FFFFFF;
+            pixels[pixel] = rgb == 0x00FF00FF ? 0 : (rgb | 0xFF000000);
+        }
+        SelectObject(dc, oldBitmap);
+        ImageList_Add(images, bitmap, nullptr);
+        SelectObject(dc, bitmap);
     }
     SelectObject(dc, oldBrush);
     SelectObject(dc, oldPen);
@@ -1348,17 +1355,20 @@ LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 namespace SettingsWindow {
 
-bool testNavigationIconColors(bool dark) {
+bool testNavigationIconColors(bool dark, UINT dpi) {
     const bool previousDark = g.dark;
     const bool previousHighContrast = g.highContrast;
+    const UINT previousDpi = g.dpi;
     g.dark = dark;
     g.highContrast = false;
+    g.dpi = dpi;
     const COLORREF expected = textColor();
     HIMAGELIST images = createTabImages();
+    const int size = px(16);
     g.dark = previousDark;
     g.highContrast = previousHighContrast;
+    g.dpi = previousDpi;
     if (!images) return false;
-    const int size = px(16);
     HDC dc = CreateCompatibleDC(nullptr);
     BITMAPINFO info{};
     info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -1375,25 +1385,31 @@ bool testNavigationIconColors(bool dark) {
         return false;
     }
     HGDIOBJ old = SelectObject(dc, bitmap);
-    HBRUSH background = CreateSolidBrush(RGB(255, 0, 255));
     bool ok = ImageList_GetImageCount(images) == 8;
-    for (int i = 0; i < 8 && ok; ++i) {
-        RECT rc{0, 0, size, size};
-        FillRect(dc, &rc, background);
-        ok = ImageList_Draw(images, i, dc, 0, 0, ILD_TRANSPARENT) != FALSE;
-        int strokes = 0;
-        for (int y = 0; y < size; ++y) {
-            for (int x = 0; x < size; ++x) {
-                const COLORREF color = GetPixel(dc, x, y);
-                if (color == RGB(255, 0, 255)) continue;
-                ++strokes;
-                if (color != expected) ok = false;
+    // Include normal and selected backgrounds in both themes. The former
+    // magenta-only test could not distinguish transparency from leaked tiles.
+    const COLORREF backgrounds[] = {RGB(0x19, 0x19, 0x1B), RGB(0x3A, 0x31, 0x59),
+                                   RGB(0xF0, 0xEF, 0xF5), RGB(0xE4, 0xDF, 0xFF)};
+    for (COLORREF backgroundColor : backgrounds) {
+        HBRUSH background = CreateSolidBrush(backgroundColor);
+        for (int i = 0; i < 8 && ok; ++i) {
+            RECT rc{0, 0, size, size};
+            FillRect(dc, &rc, background);
+            ok = ImageList_Draw(images, i, dc, 0, 0, ILD_TRANSPARENT) != FALSE;
+            int strokes = 0;
+            for (int y = 0; y < size; ++y) {
+                for (int x = 0; x < size; ++x) {
+                    const COLORREF color = GetPixel(dc, x, y);
+                    if (color == backgroundColor) continue;
+                    ++strokes;
+                    if (color != expected) ok = false;
+                }
             }
+            if (!strokes || GetPixel(dc, 0, 0) != backgroundColor) ok = false;
         }
-        if (!strokes) ok = false;
+        DeleteObject(background);
     }
     SelectObject(dc, old);
-    DeleteObject(background);
     DeleteObject(bitmap);
     DeleteDC(dc);
     ImageList_Destroy(images);
