@@ -6,6 +6,14 @@ namespace keyboard {
 
 namespace {
 
+// PowerToys Keyboard Manager skips single-key remaps when bit 0 is set,
+// and skips shortcut remaps for this exact value. Tag the entire sequence,
+// including key-up events, so Ctrl/Caps Lock swaps cannot turn Ctrl+V into V.
+// These are PowerToys implementation constants, not a Win32 guarantee:
+// https://github.com/microsoft/PowerToys/blob/main/src/modules/keyboardmanager/common/KeyboardManagerConstants.h
+// https://github.com/microsoft/PowerToys/blob/main/src/common/interop/shared_constants.h
+constexpr ULONG_PTR kPowerToysBypassRemapping = 0x101;
+
 void addScanKey(std::vector<INPUT>& seq, WORD vk, bool down) {
     UINT scan = MapVirtualKeyW(vk, MAPVK_VK_TO_VSC_EX);
     INPUT in{};
@@ -14,6 +22,7 @@ void addScanKey(std::vector<INPUT>& seq, WORD vk, bool down) {
     in.ki.wScan = static_cast<WORD>(scan & 0xFF);
     in.ki.dwFlags = KEYEVENTF_SCANCODE | (down ? 0 : KEYEVENTF_KEYUP);
     if (scan & 0xFF00) in.ki.dwFlags |= KEYEVENTF_EXTENDEDKEY;
+    in.ki.dwExtraInfo = kPowerToysBypassRemapping;
     seq.push_back(in);
 }
 
@@ -39,6 +48,11 @@ std::vector<INPUT> buildCtrlComboInputs(
 }
 
 } // namespace
+
+std::vector<INPUT> BuildCtrlComboInputsForTesting(
+    WORD vk, const std::vector<WORD>& heldModifiers) {
+    return buildCtrlComboInputs(vk, heldModifiers);
+}
 
 void SendCtrlCombo(WORD vk) {
     std::vector<WORD> held;
