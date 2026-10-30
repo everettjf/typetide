@@ -22,7 +22,7 @@ TypeTide 把翻译变成一个原地完成的系统动作。它常驻菜单栏�
 - **读** — 选中外语文字，按下快捷键，译文就在旁边弹出。
 - **写** — **用母语输入**，按下快捷键，文字原地改写成目标语言，直接可以发送。
 
-不用打开浏览器标签页，也不用在翻译网站之间来回复制粘贴。Apple Silicon Mac 默认使用**内置离线模型**，下载一次即可使用，无需 Ollama 或 API Key。也可以选择 **Ollama** 或自己的 API；Intel Mac 和 Windows 使用后两种方式。
+不用打开浏览器标签页，也不用在翻译网站之间来回复制粘贴。Apple Silicon Mac 默认使用**内置离线模型**，下载一次即可使用，无需 Ollama 或 API Key。也可以选择 **Ollama** 或自己的 API；Windows 同样内置离线后端，安装包和便携版包含推理运行时；Intel Mac 使用 Ollama 或 API。
 
 <p align="center">
   <img src="docs/screenshots/rewrite.gif" alt="输入中文，按下改写快捷键，原地改写为英文" width="760" />
@@ -47,7 +47,7 @@ TypeTide 把翻译变成一个原地完成的系统动作。它常驻菜单栏�
 - **写 · 原地改写** — 用母语写字，按改写快捷键，输入框内容被替换成译文。可直接替换，也可先预览。
 - **每个应用都能用** — 通过 Accessibility API（macOS）/ UI Automation（Windows）读取选区，对 Electron/网页类应用自动降级为剪贴板复制，文字接口不可用时也能工作。原剪贴板内容总会被还原。
 - **替换不破坏撤销** — 替换通过粘贴完成，保留每个应用原生的撤销栈（Ctrl+Z / ⌘Z 随时可撤销）。
-- **本地或云端** — 可插拔后端：**内置 MLX 模型**（Apple Silicon Mac）、**Ollama**（离线、私密）或任意 **OpenAI 兼容** API（`/chat/completions`，流式）。设置里一键切换。
+- **本地或云端** — 可插拔后端：**内置 TranslateGemma 模型**（Apple Silicon Mac 使用 MLX，Windows 包含 CPU 推理运行时）、**Ollama**（离线、私密）或任意 **OpenAI 兼容** API（`/chat/completions`，流式）。设置里一键切换。
 - **模型选择** — 设置里列出已安装的 Ollama 模型，根据机器内存推荐合适尺寸；配置模型没装时自动换成已安装模型。思考型模型（qwen3 系等）会自动关闭隐藏推理，翻译保持秒回。
 - **风格** — 内置模型支持忠实翻译与原位替换；正式、口语和润色改写需要 Ollama 或 API 后端。
 - **快捷键动作可组合** — 两个全局快捷键都能独立选择智能方向或固定母语/外语目标，并决定弹窗展示或原地替换。
@@ -88,7 +88,9 @@ Windows——从 [官方下载页](https://xnu.app/typetide/#top) 下载最新�
 
 **Apple Silicon Mac：**保留默认的 **Built-in (Offline)**，在首次设置或 **Settings → Backend** 中从 Hugging Face 下载模型（约 2.22 GB）。下载使用双连接，显示速度与预计剩余时间；暂停或退出后可续传已保存的 16 MiB 分片。安装期间请预留约 4.5 GB 空间，所有文件校验通过后才会使用。下载后可离线翻译，无需账号、API Key、Ollama 或 Python。支持忠实翻译；超过 2K 输入 token 的长文本需要分段。模型遵循 [Gemma 使用条款](https://ai.google.dev/gemma/terms)。
 
-**Intel Mac、Windows，或希望使用其他本地模型：**先安装 [Ollama](https://ollama.com/download)，然后：
+**Windows：**保留 **Built-in (Offline)**，在 **Settings → Translation** 下载约 2.49 GB 的 TranslateGemma GGUF 模型。安装包和便携版包含 CPU 推理运行时，无需另装 Ollama 或填写 API Key。支持忠实翻译与原位替换，其他风格可切换到 Ollama/API。
+
+**Intel Mac，或任一平台希望使用其他本地模型：**先安装 [Ollama](https://ollama.com/download)，然后：
 ```bash
 # macOS: brew install ollama · Windows: winget install Ollama.Ollama
 ollama pull qwen3.5:4b   # 或任何你喜欢的对话模型
@@ -132,7 +134,7 @@ macOS：在**系统设置 → 隐私与安全性 → 辅助功能**里允许 Typ
 
 TypeTide 能跨应用读取和替换选中文字，因此 macOS 需要辅助功能权限；Windows 通过 UI Automation 工作，无需单独授权。只有在触发快捷键、点击浮动图标或开启划词自动翻译后，应用才会取词。可在**设置 → Excluded apps** 中停用包含敏感信息的应用；如果不希望监听选区，请使用**仅快捷键**模式。
 
-- 使用 Apple Silicon 上的**内置离线模型**时，文字在 Mac 上处理；首次使用需联网下载模型。
+- 在 Apple Silicon Mac 或 Windows 使用**内置离线模型**时，文字在本机处理；首次使用需联网下载模型。
 - 使用 **Ollama** 时，取到的文字只会发往本机 `127.0.0.1` 上的 Ollama 服务；TypeTide 没有中转服务器或遥测服务。
 - 使用 **OpenAI 兼容后端**时，触发翻译后，取到的文字会发往你配置的 base URL，并受该服务商的数据保留与隐私政策约束。密码、密钥和敏感对话不应使用云端后端处理。
 - 某些应用不通过辅助功能接口暴露选区。TypeTide 会临时复制选区，读取后恢复原剪贴板；剪贴板历史或第三方剪贴板管理器仍可能记录这次临时复制。
@@ -181,7 +183,7 @@ cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build             # → build/TypeTide.exe
 ```
 
-要求：Windows 10+、Visual Studio 2022+（MSVC、CMake、Ninja）。零第三方依赖——纯 Win32 + WinHTTP + UI Automation。架构与测试体系见 [windows/README.md](windows/README.md)。
+要求：Windows 10+、Visual Studio 2022+（MSVC、CMake、Ninja）。界面使用 Win32 + WinHTTP + UI Automation；发行包包含固定版本的 llama.cpp CPU 运行时，用于离线翻译。架构与测试体系见 [windows/README.md](windows/README.md)。
 
 **发版** —— 双端共享一个版本号（根目录 `VERSION` 文件），可以以任意先后顺序附着到同一个 GitHub release：
 

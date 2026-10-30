@@ -10,9 +10,11 @@ Before updating `docs/index.html`:
 2. Update both pairs of download buttons and the platform-version line together.
    Keep the all-releases link available for portable ZIPs and older versions.
 3. Verify that the Homebrew cask points to an existing Mac asset and matching hash.
-4. Base feature claims on the relevant released build. Built-in MLX requires Apple
-   Silicon, a one-time model download, and Faithful style; Intel and Windows use
-   Ollama or an API. Do not imply the Windows download contains the Mac backend.
+4. Base feature claims on the relevant released build. Built-in translation requires a one-time model download and Faithful style.
+   Apple Silicon Macs use MLX (about 2.22 GB, resumable downloads); Windows
+   packages include a CPU inference runtime and use GGUF weights (about 2.49 GB).
+   Intel Macs use Ollama or an API. Keep optional Ollama/API choices visible.
+   Describe documented compatibility issues next to the affected download.
 5. Keep English and Chinese READMEs, introduction pages, and the xnu.app catalog
    aligned. Use the lowercase canonical URL `https://xnu.app/typetide/`.
 6. Check desktop and narrow layouts, local image paths, download-link targets,

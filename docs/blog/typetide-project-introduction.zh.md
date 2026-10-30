@@ -41,7 +41,7 @@ TypeTide 会在选区附近打开浮窗，流式显示译文。结果可以复�
 先用自己最熟悉的语言写完内容，再按：
 
 - macOS：`⌥ R`
-- Windows：`Alt + R`
+- Windows：`Ctrl + Shift + R`
 
 原文会在当前输入框中直接变成目标语言，不需要把结果从另一个窗口搬回来。
 
@@ -51,7 +51,7 @@ TypeTide 会在选区附近打开浮窗，流式显示译文。结果可以复�
 
 ## 快捷键不是写死的
 
-`⌥ D / Alt + D` 与 `⌥ R / Alt + R` 只是默认值。两个快捷键都能独立修改，也能分别决定翻译方向和结果动作。
+`⌥ D / Alt + D` 与 `⌥ R / Ctrl + Shift + R` 只是默认值。两个快捷键都能独立修改，也能分别决定翻译方向和结果动作。
 
 现在还可以彻底清空其中任意一项。只保留“读”或只保留“写”，TypeTide 都能正常工作；如果两项都清空，设置页会明确提醒至少配置一个快捷键，键盘触发才能使用。浮动图标和自动翻译等非键盘触发方式不受影响。
 
@@ -59,16 +59,17 @@ TypeTide 会在选区附近打开浮窗，流式显示译文。结果可以复�
 
 ## 本地优先，但不限制模型选择
 
-TypeTide 支持三类后端；Apple Silicon Mac 默认使用内置离线模型：
+TypeTide 支持内置模型、Ollama 和 API 三类后端；Apple Silicon Mac 和 Windows 默认使用各自的内置离线模型：
 
 | 后端 | 适合场景 | 数据去向 |
 |---|---|---|
 | 内置 MLX 模型（Apple Silicon） | 下载约 2.22 GB 后离线翻译，无需 Key 或 Ollama | 本机 |
-| Ollama | 隐私内容、离线使用、零按量费用 | 本机 `127.0.0.1` |
+| 内置 GGUF 模型（Windows） | 下载约 2.49 GB 后离线翻译，发行包包含 CPU 运行时 | 本机 |
+| Ollama（可选） | 使用自己管理的本地模型 | 本机 `127.0.0.1` |
 | OpenAI 兼容接口 | 更快的云模型或自建服务 | 用户配置的服务地址 |
 
 
-Ollama 是一等公民，而不是附带选项。TypeTide 会列出本机已安装模型、根据机器内存给出建议，并在原配置模型不存在时选择可用模型。对于 qwen3 等思考型模型，还会关闭不必要的隐藏推理，避免一次简单翻译等待很久。
+Ollama 仍可作为自选本地模型后端。TypeTide 会列出本机已安装模型、根据机器内存给出建议，并在原配置模型不存在时选择可用模型。对于 qwen3 等思考型模型，还会关闭不必要的隐藏推理，避免一次简单翻译等待很久。
 
 OpenAI 兼容模式使用标准 `/chat/completions` 与 SSE 流式响应，可连接 OpenAI、OpenRouter、DeepSeek、兼容服务或自己的网关。API Key 在 macOS 存入钥匙串，在 Windows 存入 Credential Manager，而不是明文写进设置文件。
 
@@ -97,7 +98,7 @@ macOS 需要用户授予辅助功能权限；Windows 不需要额外的系统权
 | 取词接口 | Accessibility | UI Automation |
 | 网络接口 | URLSession | WinHTTP |
 | 开机启动 | SMAppService | HKCU Run |
-| 模型运行 | 内置 MLX（Apple Silicon）；可选 Ollama/API | Ollama/API |
+| 模型运行 | 内置 MLX（Apple Silicon）；可选 Ollama/API | 内置 GGUF（CPU）；可选 Ollama/API |
 
 核心链路保持一致：触发 → 捕获选区 → 路由模型 → 流式翻译 → 弹窗显示或原地替换。Windows 端特别保证主消息循环不会被网络和剪贴板操作阻塞；macOS 端则对辅助功能授权、快捷键注册和选区捕获做了分层处理。
 
@@ -140,7 +141,7 @@ macOS 和 Windows 使用完全相同的十种检测与翻译语言：
 ## 三步开始使用
 
 1. **安装应用。** 从 [官方下载页](https://xnu.app/typetide/#top) 下载 macOS DMG、Windows 安装版 EXE 或便携版 ZIP。macOS 用户也可运行 `brew install --cask everettjf/tap/typetide`。
-2. **选择后端。** Apple Silicon Mac 使用默认的 **Built-in (Offline)**，下载约 2.22 GB 模型后即可离线使用，无需 Key 或 Ollama。下载显示速度与预计剩余时间，暂停或退出后可续传已保存分片；安装期间预留约 4.5 GB 空间。内置模型的 2K 输入 token 限制意味着长文本需要分段。Intel Mac 和 Windows 使用 Ollama 或自己的 API。
+2. **选择后端。** Apple Silicon Mac 使用默认的 **Built-in (Offline)**，下载约 2.22 GB 模型后即可离线使用，无需 Key 或 Ollama。下载显示速度与预计剩余时间，暂停或退出后可续传已保存分片；安装期间预留约 4.5 GB 空间。内置模型的 2K 输入 token 限制意味着长文本需要分段。Windows 默认内置 GGUF 后端，下载约 2.49 GB 模型后即可离线使用，无需另装 Ollama。Intel Mac 使用 Ollama 或自己的 API。
 3. **完成首次检查。** macOS 授予辅助功能权限，Windows 无需额外系统权限；然后在设置中测试后端并验证已配置的快捷键。选中文字按“读”，输入文字按“写”。
 
 目前系统要求为 macOS 26+ 或 Windows 10+。macOS 安装包经过 Developer ID 签名与 Apple 公证；Windows 提供无需管理员权限的按用户安装包和便携版。

@@ -22,11 +22,12 @@ Want to read before you send? Flip on rewrite **preview** in Settings and approv
 
 ## Local-first, or bring your own model
 
-Apple Silicon Macs default to a built-in offline model; three backend options are available:
+Apple Silicon Macs and Windows default to a built-in offline model. Ollama and API backends are optional:
 
 - **Built-in (Apple Silicon Mac)** — download TranslateGemma 4B once (about 2.22 GB), then translate offline without an account, API key, Ollama, or Python setup. Downloads can pause and resume across restarts, show speed and time estimates, and verify files before use. Allow about 4.5 GB free during installation. Supports Faithful translation and in-place replacement; selections above the 2K input-token limit need to be shortened.
-- **Ollama (local)** — run a model like `qwen2.5:3b` on your own machine. Nothing leaves your Mac, it works on a plane, and there's no per-token bill. If your configured model isn't installed, TypeTide auto-picks one that is.
-- **OpenAI-compatible (cloud)** — point it at any `/chat/completions` endpoint with a base URL, key, and model name. Great when you want maximum speed or a frontier model.
+- **Built-in (Windows)** — the installer and portable ZIP bundle a CPU inference runtime. Download the TranslateGemma GGUF model once (about 2.49 GB), then translate offline without installing Ollama or entering an API key. Supports Faithful translation and in-place replacement.
+- **Ollama (optional, local)** — run a model like `qwen2.5:3b` on your own machine. Selected text stays on your computer, it works on a plane, and there's no per-token bill. If your configured model isn't installed, TypeTide auto-picks one that is.
+- **OpenAI-compatible (optional)** — point it at any `/chat/completions` endpoint with a base URL, key, and model name. Translation is sent to the endpoint you configure.
 
 The backends stream their output token by token, so translations appear as they're generated.
 
@@ -63,9 +64,9 @@ Under the hood it's a focused, native Swift app: a `SelectionCapture` layer over
 
 ## Get started in three steps
 
-1. **Install.** Grab the latest `.dmg` from the [Releases](https://github.com/everettjf/typetide/releases) page and drag it to Applications.
-2. **Pick a backend.** On Apple Silicon Macs, keep **Built-in (Offline)** and download the model once. Intel Macs use Ollama or an OpenAI-compatible API.
-3. **Grant Accessibility.** Allow TypeTide under **System Settings → Privacy & Security → Accessibility** (it's what lets the app read selections and replace text). Then select text → <kbd>⌥</kbd><kbd>D</kbd>, or type → <kbd>⌥</kbd><kbd>R</kbd>.
+1. **Install.** Download the macOS DMG or Windows installer/portable ZIP from [Downloads](https://xnu.app/typetide/#top). macOS users can also run `brew install --cask everettjf/tap/typetide`.
+2. **Pick a backend.** On Apple Silicon Macs or Windows, keep **Built-in (Offline)** and download the platform-specific model once. Intel Macs use Ollama or an OpenAI-compatible API.
+3. **Complete setup.** On macOS, allow TypeTide under **System Settings → Privacy & Security → Accessibility** (it's what lets the app read selections and replace text). Then select text → <kbd>⌥</kbd><kbd>D</kbd>, or select your writing → <kbd>⌥</kbd><kbd>R</kbd>. Windows defaults to Alt+D for reading and Ctrl+Shift+R for replacement.
 
 Everything — shortcuts, triggers, styles, languages — is configurable in Settings.
 

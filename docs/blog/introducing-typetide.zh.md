@@ -36,11 +36,12 @@ TypeTide 用"粘贴"的方式写回结果，所以 App 原生的 **撤销** 依�
 
 ## 二、本地优先，或自带模型
 
-Apple Silicon Mac 默认使用内置离线模型，也可以选择其他后端：
+Apple Silicon Mac 和 Windows 默认使用内置离线模型，Ollama 与 API 都是可选后端：
 
 - **内置离线模型（Apple Silicon Mac）** —— 下载约 2.22 GB 的 TranslateGemma 4B 后即可离线翻译，无需账号、API Key、Ollama 或 Python。下载可暂停并在重启后续传，显示速度与预计剩余时间，校验文件后才会使用；安装期间预留约 4.5 GB 空间。支持忠实翻译与原位替换；超过 2K 输入 token 的长文本需要分段。
-- **Ollama（本地）** —— 在自己机器上跑 `qwen2.5:3b` 这样的模型。数据不出本机，在飞机上也能用，也没有按 token 计费。如果你配置的模型没装，TypeTide 会自动挑一个已装的。
-- **OpenAI 兼容（云端）** —— 指向任意 `/chat/completions` 接口，填好 base URL、key 和模型名即可。想要极致速度或前沿模型时很合适。
+- **内置离线模型（Windows）** —— 安装包和便携版包含 CPU 推理运行时，下载约 2.49 GB 的 TranslateGemma GGUF 模型后即可离线翻译，无需另装 Ollama 或填写 API Key。支持忠实翻译与原位替换。
+- **Ollama（可选，本地）** —— 在自己机器上跑 `qwen2.5:3b` 这样的模型。数据不出本机，在飞机上也能用，也没有按 token 计费。如果你配置的模型没装，TypeTide 会自动挑一个已装的。
+- **OpenAI 兼容（可选）** —— 指向任意 `/chat/completions` 接口，填好 base URL、key 和模型名即可。翻译文字会发往配置的服务地址。
 
 各后端都是 **逐 token 流式** 输出，所以译文是边生成边出现的。
 
@@ -81,8 +82,8 @@ Apple Silicon Mac 默认使用内置离线模型，也可以选择其他后端�
 
 ## 六、三步上手
 
-1. **安装。** 从 [Releases](https://github.com/everettjf/typetide/releases) 下载最新的 `.dmg`，拖进 Applications。
-2. **选后端。** Apple Silicon Mac 保留 **Built-in (Offline)** 并下载模型；Intel Mac 使用 Ollama 或自己的 OpenAI 兼容接口。
+1. **安装。** 从[官方下载页](https://xnu.app/typetide/#top)下载 macOS DMG、Windows 安装包或便携版。macOS 也可运行 `brew install --cask everettjf/tap/typetide`。
+2. **选后端。** Apple Silicon Mac 和 Windows 保留 **Built-in (Offline)** 并下载各自的模型；Intel Mac 使用 Ollama 或自己的 OpenAI 兼容接口。
 3. **授予辅助功能权限。** 在 **系统设置 → 隐私与安全性 → 辅助功能** 里允许 TypeTide（这是它能读取选区、替换文字的前提）。然后：选中文字 → <kbd>⌥</kbd><kbd>D</kbd>，或打字 → <kbd>⌥</kbd><kbd>R</kbd>。
 
 快捷键、触发方式、风格、语言——全都可以在设置里调。

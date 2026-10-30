@@ -4,11 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>TypeTide — System-wide AI translation &amp; inline rewrite</title>
-<meta name="description" content="Type in your language. Read and rewrite in any app on macOS and Windows, with built-in offline translation on Apple Silicon Macs, or Ollama and your own API on Mac and Windows." />
+<meta name="description" content="Type in your language. Read and rewrite in any app on macOS and Windows, with built-in offline models on Apple Silicon Macs and Windows. Download a model once; no Ollama or API key needed. Ollama and your own API remain optional." />
 <link rel="canonical" href="https://xnu.app/typetide/" />
 <meta property="og:title" content="TypeTide — Type in your language. Read and rewrite anywhere." />
 <meta property="og:url" content="https://xnu.app/typetide/" />
-<meta property="og:description" content="Translate in place on Mac and Windows. Apple Silicon Macs can download a built-in offline model without an API key." />
+<meta property="og:description" content="Translate in place with built-in offline models on Apple Silicon Macs and Windows. No Ollama or API key needed after the initial model download." />
 <meta property="og:type" content="website" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23d23a1d'/><text x='50' y='72' font-size='62' font-family='Georgia,serif' fill='%23f5f0e6' text-anchor='middle'>T</text></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,12 +60,12 @@
           letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
   .kicker .tick{width:26px;height:1px;background:var(--line-2)}
   h1{font-family:var(--display);font-weight:600;font-size:clamp(46px,8.2vw,104px);line-height:.96;
-     letter-spacing:-.025em;margin:22px 0 0;max-width:14ch}
+     letter-spacing:-.025em;margin:22px 0 0;max-width:none}
   h1 em{font-style:italic;font-weight:500}
-  .roll{display:inline-block;height:1.02em;overflow:hidden;vertical-align:bottom;position:relative}
+  .roll{display:inline-block;width:10ch;max-width:100%;height:1.02em;overflow:hidden;vertical-align:bottom;position:relative}
   .roll-list{display:flex;flex-direction:column;animation:roll 22s steps(10,end) infinite;color:var(--red)}
   .roll-list span{height:1.02em;line-height:1.02em;white-space:nowrap}
-  .roll-list span.long{font-size:.66em;padding-top:.22em}
+  .roll-list span.long small{font-size:.60em}
   @keyframes roll{
     from{transform:translateY(0)}
     to{transform:translateY(-10.20em)}
@@ -79,6 +79,9 @@
   .cmd{display:flex;align-items:center;gap:14px;background:var(--ink);color:var(--paper);
        font-family:var(--mono);font-size:14.5px;padding:13px 16px;border-radius:12px;
        box-shadow:0 12px 30px rgba(28,24,20,.22);border:1px solid var(--ink)}
+  .cmd{max-width:100%}
+  .cmd > span{min-width:0;overflow-wrap:anywhere}
+  .cmd button{flex-shrink:0}
   .cmd .pr{color:var(--red-2);filter:brightness(1.7)}
   .cmd button{margin-left:4px;background:rgba(244,238,226,.12);border:1px solid rgba(244,238,226,.22);
        color:var(--paper);font-family:var(--mono);font-size:12px;padding:5px 10px;border-radius:7px;cursor:pointer;transition:.18s}
@@ -94,7 +97,7 @@
   /* figure plates */
   .plate{background:var(--card);border:1px solid var(--line-2);border-radius:16px;padding:14px;
          box-shadow:8px 8px 0 rgba(28,24,20,.08);position:relative}
-  .plate img{width:100%;display:block;border-radius:9px;border:1px solid var(--line)}
+  .plate img{width:100%;height:auto;display:block;border-radius:9px;border:1px solid var(--line)}
   .figtag{position:absolute;top:-13px;left:18px;background:var(--red);color:var(--paper);
           font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:3px 10px;border-radius:7px;
           box-shadow:0 3px 0 var(--red-2)}
@@ -140,7 +143,7 @@
   .language-pill small{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:7px;text-transform:uppercase}
 
   /* backends */
-  .be-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:46px}
+  .be-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:46px}
   .be{background:var(--card);border:1px solid var(--line-2);border-radius:16px;padding:30px;box-shadow:6px 6px 0 rgba(28,24,20,.06)}
   .be .tag{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
   .be h4{font-family:var(--display);font-size:24px;font-weight:600;margin:8px 0 10px}
@@ -203,29 +206,30 @@
     <span class="kicker"><span class="tick"></span> macOS + Windows · native · open source</span>
     <h1>Type in
       <span class="roll"><span class="roll-list">
-        <span>English.</span><span>中文.</span><span>हिन्दी.</span><span>Español.</span><span>Français.</span><span>العربية.</span><span>বাংলা.</span><span>Русский.</span><span>Português.</span><span class="long">Bahasa Indonesia.</span><span>English.</span>
+        <span>English.</span><span>中文.</span><span>हिन्दी.</span><span>Español.</span><span>Français.</span><span>العربية.</span><span>বাংলা.</span><span>Русский.</span><span>Português.</span><span class="long"><small>Bahasa Indonesia.</small></span><span>English.</span>
       </span></span>
       <svg class="underx" viewBox="0 0 440 13" fill="none" preserveAspectRatio="none"><path d="M3 8C84 3 210 2 437 6" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
       <em>Rewrite</em> in place.
     </h1>
-    <p class="sub">Write a message in your own language and <b>translate it in the same input field</b>. Select incoming text to read its translation beside it. On Apple Silicon Macs, download the built-in model once — <b>no API key or Ollama needed</b>.</p>
+    <p class="sub">Write a message in your own language and <b>translate it in the same input field</b>. Select incoming text to read its translation beside it. On Apple Silicon Macs and Windows, download the built-in model once — <b>no Ollama or API key needed</b>.</p>
 
     <div class="actions">
       <div class="cmd" id="brew">
         <span><b>macOS</b> · <span class="pr">$</span> brew install --cask everettjf/tap/typetide</span>
         <button onclick="copyBrew()" id="copybtn">Copy</button>
       </div>
-      <a class="btn solid" href="https://github.com/everettjf/typetide/releases/download/v0.1.16/TypeTide-0.1.16.dmg" target="_blank" rel="noopener noreferrer">Download for macOS</a>
-      <a class="btn line" href="https://github.com/everettjf/typetide/releases/download/v0.1.14/TypeTide-Setup-0.1.14.exe" target="_blank" rel="noopener noreferrer">Download for Windows</a>
+      <a class="btn solid" href="https://github.com/everettjf/typetide/releases/download/v0.1.21/TypeTide-0.1.21.dmg" target="_blank" rel="noopener noreferrer">Download for macOS</a>
+      <a class="btn line" href="https://github.com/everettjf/typetide/releases/download/v0.1.21/TypeTide-Setup-0.1.21.exe" target="_blank" rel="noopener noreferrer">Download for Windows</a>
     </div>
-    <p class="meta"><b>macOS 26+</b> · Mac download: 0.1.16 · <b>Windows 10+ x64</b> · Windows download: 0.1.14 · <b>Free &amp; open source</b></p>
-    <p class="meta">Built-in offline model: Apple Silicon only, about 2.22 GB to download. Intel Macs and Windows use Ollama or an API. <a href="https://github.com/everettjf/typetide/releases">All releases and portable Windows ZIPs ↗</a></p>
+    <p class="meta"><b>macOS 26+</b> · Mac download: 0.1.21 · <b>Windows 10+ x64</b> · Windows download: 0.1.21 · <b>Free &amp; open source</b></p>
+    <p class="meta">One-time model download: about 2.22 GB on Apple Silicon Macs, 2.49 GB on Windows. Intel Macs use Ollama or an API. <a href="https://github.com/everettjf/typetide/releases">All releases and portable Windows ZIPs ↗</a></p>
+    <p class="meta">macOS 26.6 launch compatibility is being tracked in <a href="https://github.com/everettjf/typetide/issues/11">issue #11</a>.</p>
   </header>
 
   <div class="hero-fig plate reveal">
-    <span class="figtag">FIG. 01 — REWRITE · ⌥R / ALT+R</span>
-    <img src="screenshots/rewrite.gif" alt="Type Chinese, press the shortcut, and it is rewritten into English in place" loading="lazy" />
-    <p class="figcap">Type in your language → press the shortcut → rewritten in place, ready to send.</p>
+    <span class="figtag">FIG. 01 — BUILT-IN OFFLINE · MACOS</span>
+    <img src="screenshots/backend.png" alt="TypeTide macOS backend settings showing the built-in TranslateGemma model ready for offline translation, with optional Ollama and API choices" width="1200" height="754" loading="lazy" />
+    <p class="figcap">The built-in model runs on your computer. Download it once, then translate offline. Screenshot: macOS app.</p>
   </div>
 </div>
 
@@ -243,18 +247,18 @@
         <p>Select foreign text in any app and a clean popup shows the translation right beside it — streaming, with one-click Copy or Replace. Trigger by shortcut, a floating icon, or auto on select.</p>
         <div class="key"><kbd>macOS · ⌥ D</kbd><kbd>Windows · Alt + D</kbd></div>
         <div class="plate">
-          <span class="figtag">FIG. 02 — READ</span>
-          <img src="screenshots/translate.gif" alt="Translation streams into a popup over selected text" loading="lazy" />
+          <span class="figtag">FIG. 02 — SELECTION &amp; PREVIEW · MACOS</span>
+          <img src="screenshots/behavior.png" alt="TypeTide macOS behavior settings for selection triggers, replacement preview, and Faithful translation" width="1200" height="608" loading="lazy" />
         </div>
       </div>
       <div class="mode reveal">
         <div class="big">02</div>
         <h3>Write · rewrite in place</h3>
-        <p>Think in your language, send in another. Type, hit the shortcut, and your text is replaced in place with the translation — undo-safe, so a single ⌘Z brings the original back.</p>
-        <div class="key"><kbd>macOS · ⌥ R</kbd><kbd>Windows · Alt + R</kbd></div>
+        <p>Think in your language, send in another. Select your message, press the shortcut, and replace it with the translation in the same field. Undo with ⌘Z on Mac or Ctrl+Z on Windows. You can also preview before replacing.</p>
+        <div class="key"><kbd>macOS · ⌥ R</kbd><kbd>Windows · Ctrl + Shift + R</kbd></div>
         <div class="plate">
-          <span class="figtag">FIG. 03 — ICON</span>
-          <img src="screenshots/icon.png" alt="Floating translate icon next to a selection" loading="lazy" />
+          <span class="figtag">FIG. 03 — SHORTCUTS · MACOS</span>
+          <img src="screenshots/shortcuts.png" alt="TypeTide macOS shortcut settings with independent popup and replacement actions" width="1200" height="438" loading="lazy" />
         </div>
       </div>
     </div>
@@ -304,7 +308,7 @@
 <section id="backends">
   <div class="wrap">
     <div class="sec-head reveal"><span class="sec-no">§ YOUR MODEL</span><h2>Local or cloud.</h2></div>
-    <p class="sec-lead reveal">Start with the built-in offline model on Apple Silicon. Choose Ollama or an API on either platform when you need another model or writing style.</p>
+    <p class="sec-lead reveal">Start with the built-in offline model on Apple Silicon Macs or Windows. Ollama is optional; use it or an API when you want another model or writing style. Intel Macs use Ollama or an API.</p>
 
     <div class="be-grid">
       <div class="be reveal">
@@ -314,14 +318,20 @@
         <p>Faithful translation and in-place replacement. Long selections above the model’s 2K input-token limit need to be shortened.</p>
       </div>
       <div class="be reveal">
-        <span class="tag">Mac + Windows · local</span>
+        <span class="tag">Windows · default</span>
+        <h4>Built-in offline model</h4>
+        <p>Download TranslateGemma 4B once (about 2.49 GB), then translate locally on your CPU. The installer and portable ZIP include the inference runtime. No Ollama, account, or API key is required.</p>
+        <p>Supports Faithful translation and in-place replacement. For other writing styles, choose an optional backend below.</p>
+      </div>
+      <div class="be reveal">
+        <span class="tag">Mac + Windows · optional</span>
         <h4>Ollama</h4>
-        <p>Offline and private. Install a model and go — TypeTide auto-picks an installed one if your configured model isn't there.</p>
+        <p>Use your own local model. Install Ollama and a model first; TypeTide lists installed models and can pick an available one if your configured model is missing.</p>
         <pre><span class="pr">$</span> ollama pull qwen3.5:4b</pre>
       </div>
       <div class="be reveal">
-        <span class="tag">Bring your own</span>
-        <h4>OpenAI-compatible</h4>
+        <span class="tag">Mac + Windows · optional</span>
+        <h4>Your API</h4>
         <p>Use OpenAI, OpenRouter, DeepSeek, or any custom <code style="font-family:var(--mono)">/chat/completions</code> endpoint. Credentials stay in Keychain or Windows Credential Manager.</p>
         <pre>base URL · API key · model</pre>
       </div>
@@ -332,11 +342,11 @@
 <div class="wrap">
   <div class="band reveal">
     <h2>Type here. Translate here.</h2>
-    <p>Free and open source. Install, complete the permission and backend checks, then try your first translation. Initial model download time depends on your connection.</p>
+    <p>On Apple Silicon Macs or Windows, install TypeTide, keep Built-in (Offline), and download the model in settings. On Mac, grant Accessibility access, then verify your shortcuts. Once the model is ready, translation works offline. Ollama is optional.</p>
     <p class="meta"><b>macOS</b> · signed &amp; notarized DMG or Homebrew &nbsp;·&nbsp; <b>Windows</b> · per-user installer or portable ZIP</p>
     <div class="actions">
-      <a class="btn solid" href="https://github.com/everettjf/typetide/releases/download/v0.1.16/TypeTide-0.1.16.dmg" target="_blank" rel="noopener noreferrer">Download for macOS</a>
-      <a class="btn line" href="https://github.com/everettjf/typetide/releases/download/v0.1.14/TypeTide-Setup-0.1.14.exe" target="_blank" rel="noopener noreferrer">Download for Windows</a>
+      <a class="btn solid" href="https://github.com/everettjf/typetide/releases/download/v0.1.21/TypeTide-0.1.21.dmg" target="_blank" rel="noopener noreferrer">Download for macOS</a>
+      <a class="btn line" href="https://github.com/everettjf/typetide/releases/download/v0.1.21/TypeTide-Setup-0.1.21.exe" target="_blank" rel="noopener noreferrer">Download for Windows</a>
       <a class="btn line" href="https://github.com/everettjf/typetide">★ Star on GitHub</a>
     </div>
   </div>
