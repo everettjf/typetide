@@ -25,13 +25,8 @@ TypeTide 把翻译变成一个原地完成的系统动作。它常驻菜单栏�
 不用打开浏览器标签页，也不用在翻译网站之间来回复制粘贴。Apple Silicon Mac 默认使用**内置离线模型**，下载一次即可使用，无需 Ollama 或 API Key。也可以选择 **Ollama** 或自己的 API；Windows 同样内置离线后端，安装包和便携版包含推理运行时；Intel Mac 使用 Ollama 或 API。
 
 <p align="center">
-  <img src="docs/screenshots/rewrite.gif" alt="输入中文，按下改写快捷键，原地改写为英文" width="760" />
-  <br/><sub><i>写 · 用母语输入，在 macOS 按 <kbd>⌥R</kbd>，或在 Windows 按 <kbd>Ctrl+Shift+R</kbd>，原地改写成目标语言。</i></sub>
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/translate.gif" alt="选中文字，译文流式显示在弹窗里" width="760" />
-  <br/><sub><i>读 · 选中文字，译文流式显示在弹窗里——可复制或替换。</i></sub>
+  <img src="docs/screenshots/backend.png" alt="TypeTide backend settings" width="760" />
+  <br/><sub><i>内置模型、Ollama 与 API 可在设置中切换。</i></sub>
 </p>
 
 <p align="center">
@@ -68,7 +63,7 @@ TypeTide 把翻译变成一个原地完成的系统动作。它常驻菜单栏�
 
 ## 🌍 语言
 
-macOS 和 Windows 使用完全相同的 10 种检测与翻译语言：**English（英语，`en`）、中文（`zh`）、हिन्दी（印地语，`hi`）、Español（西班牙语，`es`）、Français（法语，`fr`）、العربية（阿拉伯语，`ar`）、বাংলা（孟加拉语，`bn`）、Русский（俄语，`ru`）、Português（葡萄牙语，`pt`）、Bahasa Indonesia（印尼语，`id`）**。
+macOS 和 Windows 使用完全相同的 11 种检测与翻译语言：**English（英语，`en`）、中文（`zh`）、हिन्दी（印地语，`hi`）、Español（西班牙语，`es`）、Français（法语，`fr`）、العربية（阿拉伯语，`ar`）、বাংলা（孟加拉语，`bn`）、Русский（俄语，`ru`）、Português（葡萄牙语，`pt`）、Bahasa Indonesia（印尼语，`id`）、Tiếng Việt（越南语，`vi`）**。
 
 在**设置 → Language** 里选好你的母语和外语。读/写快捷键（macOS 为 `⌥D / ⌥R`，Windows 为 `Alt+D / Ctrl+Shift+R`）各有独立方向：**自动**检测选中文字的语言并翻译成另一种，混合语言容易误判时也可以钉死**固定**方向。
 

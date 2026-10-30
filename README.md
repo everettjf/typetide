@@ -25,18 +25,8 @@ TypeTide turns translation into an in-place system action. It lives in your menu
 No browser tab and no copy-paste loop. On Apple Silicon Macs, translation defaults to an **integrated MLX model**, downloaded once and run offline without Ollama. You can also choose **Ollama** or an **OpenAI-compatible** endpoint. Windows also includes a built-in offline backend, with its inference runtime bundled in the installer and portable ZIP. Intel Macs use Ollama or an API.
 
 <p align="center">
-  <img src="docs/screenshots/tide-transition.gif" alt="TypeTide's particle tide sweeps across selected text while the translation streams in" width="760" />
-  <br/><sub><i>The TypeTide transition · a particle tide carries the original text into its streamed translation.</i></sub>
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/rewrite.gif" alt="Type Chinese, press the rewrite shortcut, and it is rewritten into English in place" width="760" />
-  <br/><sub><i>Write · type in your language, press <kbd>⌥R</kbd> on macOS or <kbd>Ctrl+Shift+R</kbd> on Windows, and it’s rewritten in place.</i></sub>
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/translate.gif" alt="Select text and the translation streams into a popup" width="760" />
-  <br/><sub><i>Read · select text and the translation streams into a popup — Copy or Replace.</i></sub>
+  <img src="docs/screenshots/backend.png" alt="TypeTide backend settings" width="760" />
+  <br/><sub><i>Choose the built-in offline model, Ollama, or an API in Settings.</i></sub>
 </p>
 
 <p align="center">
@@ -73,7 +63,7 @@ No browser tab and no copy-paste loop. On Apple Silicon Macs, translation defaul
 
 ## 🌍 Languages
 
-Detection and translation use the same 10-language set on macOS and Windows: **English (`en`), 中文 (`zh`), हिन्दी (`hi`), Español (`es`), Français (`fr`), العربية (`ar`), বাংলা (`bn`), Русский (`ru`), Português (`pt`), and Bahasa Indonesia (`id`)**.
+Detection and translation use the same 11-language set on macOS and Windows: **English (`en`), 中文 (`zh`), हिन्दी (`hi`), Español (`es`), Français (`fr`), العربية (`ar`), বাংলা (`bn`), Русский (`ru`), Português (`pt`), Bahasa Indonesia (`id`), and Tiếng Việt (`vi`)**.
 
 Pick your native and foreign language in **Settings → Language**. Each Read/Write shortcut (`⌥D / ⌥R` on macOS, `Alt+D / Ctrl+Shift+R` on Windows) has its own direction: **auto** detects the selected text's language and translates the other way, or pin a **fixed** direction for mixed-language text.
 

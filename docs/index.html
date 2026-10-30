@@ -63,12 +63,12 @@
      letter-spacing:-.025em;margin:22px 0 0;max-width:none}
   h1 em{font-style:italic;font-weight:500}
   .roll{display:inline-block;width:10ch;max-width:100%;height:1.02em;overflow:hidden;vertical-align:bottom;position:relative}
-  .roll-list{display:flex;flex-direction:column;animation:roll 22s steps(10,end) infinite;color:var(--red)}
+  .roll-list{display:flex;flex-direction:column;animation:roll 22s steps(11,end) infinite;color:var(--red)}
   .roll-list span{height:1.02em;line-height:1.02em;white-space:nowrap}
   .roll-list span.long small{font-size:.60em}
   @keyframes roll{
     from{transform:translateY(0)}
-    to{transform:translateY(-10.20em)}
+    to{transform:translateY(-11.22em)}
   }
   .underx{display:block;width:min(440px,70%);height:13px;margin-top:-2px;color:var(--red)}
   .sub{max-width:38ch;margin:30px 0 0;font-size:clamp(17px,2.1vw,21px);color:var(--ink-2);line-height:1.55}
@@ -206,7 +206,7 @@
     <span class="kicker"><span class="tick"></span> macOS + Windows · native · open source</span>
     <h1>Type in
       <span class="roll"><span class="roll-list">
-        <span>English.</span><span>中文.</span><span>हिन्दी.</span><span>Español.</span><span>Français.</span><span>العربية.</span><span>বাংলা.</span><span>Русский.</span><span>Português.</span><span class="long"><small>Bahasa Indonesia.</small></span><span>English.</span>
+        <span>English.</span><span>中文.</span><span>हिन्दी.</span><span>Español.</span><span>Français.</span><span>العربية.</span><span>বাংলা.</span><span>Русский.</span><span>Português.</span><span class="long"><small>Bahasa Indonesia.</small></span><span>Tiếng Việt.</span><span>English.</span>
       </span></span>
       <svg class="underx" viewBox="0 0 440 13" fill="none" preserveAspectRatio="none"><path d="M3 8C84 3 210 2 437 6" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
       <em>Rewrite</em> in place.
@@ -221,9 +221,9 @@
       <a class="btn solid" href="https://github.com/everettjf/typetide/releases/download/v0.1.21/TypeTide-0.1.21.dmg" target="_blank" rel="noopener noreferrer">Download for macOS</a>
       <a class="btn line" href="https://github.com/everettjf/typetide/releases/download/v0.1.21/TypeTide-Setup-0.1.21.exe" target="_blank" rel="noopener noreferrer">Download for Windows</a>
     </div>
-    <p class="meta"><b>macOS 26+</b> · Mac download: 0.1.21 · <b>Windows 10+ x64</b> · Windows download: 0.1.21 · <b>Free &amp; open source</b></p>
+    <p class="meta"><b>macOS 26+</b> · Mac download: 0.1.21 build 2 · <b>Windows 10+ x64</b> · Windows download: 0.1.21 build 2 · <b>Free &amp; open source</b></p>
     <p class="meta">One-time model download: about 2.22 GB on Apple Silicon Macs, 2.49 GB on Windows. Intel Macs use Ollama or an API. <a href="https://github.com/everettjf/typetide/releases">All releases and portable Windows ZIPs ↗</a></p>
-    <p class="meta">macOS 26.6 launch compatibility is being tracked in <a href="https://github.com/everettjf/typetide/issues/11">issue #11</a>.</p>
+    <p class="meta">Already installed 0.1.21? Download and reinstall build 2 for Vietnamese support, the macOS 26 startup fix, and improved browser-field capture. The in-app updater will not announce this same-version reissue.</p>
   </header>
 
   <div class="hero-fig plate reveal">
@@ -287,7 +287,7 @@
 <section id="languages">
   <div class="wrap">
     <div class="sec-head reveal"><span class="sec-no">§ LANGUAGES</span><h2>Think in yours.<br>Type in another.</h2></div>
-    <p class="sec-lead reveal">Detection and translation use the same ten-language set on macOS and Windows.</p>
+    <p class="sec-lead reveal">Detection and translation use the same eleven-language set on macOS and Windows.</p>
     <div class="language-grid reveal">
       <span class="language-pill">English <small>EN</small></span>
       <span class="language-pill">中文 <small>ZH</small></span>
@@ -299,6 +299,7 @@
       <span class="language-pill">Русский <small>RU</small></span>
       <span class="language-pill">Português <small>PT</small></span>
       <span class="language-pill">Bahasa Indonesia <small>ID</small></span>
+      <span class="language-pill">Tiếng Việt <small>VI</small></span>
     </div>
   </div>
 </section>

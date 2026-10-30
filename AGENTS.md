@@ -19,7 +19,7 @@ Shortcut / SelectionMonitor ─► SelectionCapture ─► TranslationService �
 ```
 
 Backends: macOS defaults to built-in MLX / TranslateGemma 4B (Apple Silicon, one-time model download). Ollama (`http://127.0.0.1:11434`) remains selectable on both platforms, as does any OpenAI-compatible
-endpoint (`/chat/completions`, SSE streaming). 10 languages, native/foreign
+endpoint (`/chat/completions`, SSE streaming). 11 languages, native/foreign
 pair, per-shortcut direction (auto-detect or fixed), 4 rewrite styles.
 
 ## macOS (`macos/`)
@@ -57,7 +57,7 @@ dependencies (tiny JSON parser included in `src/Json.h`).
 - `src/TextReplacer.*` — synthetic Ctrl+V paste (undo-safe), clipboard restored after.
 - `src/Translator.*` — provider interface; Ollama NDJSON + OpenAI SSE streaming over WinHTTP; in-memory LRU cache. Ollama requests send `"think": false` (retry without on 400) — thinking models (qwen3 family) otherwise stall for minutes on hidden reasoning.
 - `src/OllamaModels.*` — `/api/tags` model list (settings dropdown) + auto-replace an uninstalled configured model at startup.
-- `src/Language.*` — 10 languages, prompts, detection (script ranges + Latin stopword scoring).
+- `src/Language.*` — 11 languages, prompts, detection (script ranges + Latin stopword scoring).
 - `src/PopupWindow.*` — streaming translation popup (Copy / Replace, Esc / click-outside dismiss).
 - `src/SelectionIcon.*` / `src/SelectionMonitor.*` — floating icon & auto-translate triggers (WH_MOUSE_LL).
 - `src/SettingsWindow.*` — native settings dialog (tabs: General, Backend, Language, Shortcuts, Behavior, About).

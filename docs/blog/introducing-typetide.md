@@ -46,7 +46,7 @@ The built-in model supports Faithful translation. Ollama and API backends also s
 
 ## Languages
 
-Detection and translation cover the ten most-spoken languages: English, Chinese, Hindi, Spanish, French, Arabic, Bengali, Russian, Portuguese, and Indonesian. Pick your native language and a target once; the read direction is detected automatically.
+Detection and translation cover eleven languages: English, Chinese, Hindi, Spanish, French, Arabic, Bengali, Russian, Portuguese, Indonesian, and Vietnamese. Pick your native language and a target once; the read direction is detected automatically.
 
 ## How it works, in one diagram
 
