@@ -1,0 +1,93 @@
+name: Release candidate validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_tag:
+        description: Draft release containing the notarized macOS candidate
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows installer, portable ZIP and native self-tests
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and verify release packages
+        shell: pwsh
+        run: ./windows/scripts/build-release.ps1
+      - name: Exercise bundled offline model, including Vietnamese
+        shell: pwsh
+        run: |
+          $env:TYPETIDE_DATA_DIR = Join-Path $env:RUNNER_TEMP "typetide-release-live"
+          $stdout = Join-Path $env:RUNNER_TEMP "typetide-builtin.log"
+          $stderr = Join-Path $env:RUNNER_TEMP "typetide-builtin-error.log"
+          $process = Start-Process -FilePath windows/build/TypeTide.exe -ArgumentList '--selftest-builtin' `
+            -NoNewWindow -Wait -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+          Get-Content $stdout
+          Get-Content $stderr
+          if ($process.ExitCode -ne 0) { throw "Offline inference failed: $($process.ExitCode)" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-release-candidate
+          path: |
+            windows/build/TypeTide-Setup-*.exe
+            windows/build/TypeTide-Windows-*.zip
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-offline-inference-log
+          path: ${{ runner.temp }}/typetide-builtin*.log
+
+  macos26:
+    name: Launch notarized release binary on macOS 26
+    runs-on: macos-26
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CANDIDATE_TAG: ${{ inputs.candidate_tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and inspect the exact notarized DMG
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < VERSION)"
+          mkdir -p "$RUNNER_TEMP/typetide-candidate"
+          gh release download "$CANDIDATE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern "TypeTide-$version.dmg" --dir "$RUNNER_TEMP/typetide-candidate"
+          dmg="$RUNNER_TEMP/typetide-candidate/TypeTide-$version.dmg"
+          shasum -a 256 "$dmg"
+          xcrun stapler validate "$dmg"
+          hdiutil attach "$dmg" -readonly -nobrowse -mountpoint "$RUNNER_TEMP/typetide-volume"
+          ditto "$RUNNER_TEMP/typetide-volume/TypeTide.app" "$RUNNER_TEMP/TypeTide.app"
+          hdiutil detach "$RUNNER_TEMP/typetide-volume"
+          ./macos/scripts/check-runtime-compatibility.sh "$RUNNER_TEMP/TypeTide.app"
+          codesign --verify --deep --strict "$RUNNER_TEMP/TypeTide.app"
+          sw_vers
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$RUNNER_TEMP/TypeTide.app/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$RUNNER_TEMP/TypeTide.app/Contents/Info.plist"
+      - name: Verify launch without a dyld crash
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/TypeTide.app/Contents/MacOS/TypeTide" > "$RUNNER_TEMP/typetide-launch.log" 2>&1 &
+          app_pid=$!
+          trap 'kill "$app_pid" 2>/dev/null || true' EXIT
+          sleep 10
+          if ! kill -0 "$app_pid" 2>/dev/null; then
+            cat "$RUNNER_TEMP/typetide-launch.log"
+            echo "Release application exited during startup on macOS 26"
+            exit 1
+          fi
+          echo "Notarized release binary remained alive on macOS 26"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: macos26-launch-log
+          path: ${{ runner.temp }}/typetide-launch.log

@@ -23,6 +23,22 @@ enum CaptureMethod: String {
     case clipboardFallback
 }
 
+/// A snapshot lets the rewrite decision be tested without granting Accessibility.
+struct RewriteCaptureContext {
+    var element: AXUIElement? = nil
+    var selectedText: String? = nil
+    var selectedRange: CFRange? = nil
+    var value: String? = nil
+    var isEditable = false
+    var isProtected = false
+}
+
+struct ClipboardCaptureOperations {
+    var press: (CGKeyCode) -> Bool
+    var hasFocus: () -> Bool
+    var restoreSelection: () -> Void
+}
+
 enum SelectionCapture {
 
     // MARK: 读模式：拿到选中的文字
@@ -50,32 +66,63 @@ enum SelectionCapture {
 
     @MainActor
     static func captureForRewrite() async -> RewriteCapture? {
+        var context = RewriteCaptureContext()
         if let element = focusedElement() {
-            // 有选区 → 只改选区
-            if let range = axSelectedRange(element), range.length > 0,
-               let sel = axSelectedText(element),
-               !sel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                recordCapture(outcome: "success", method: .accessibility, characterCount: sel.count)
-                return RewriteCapture(text: sel, isWholeField: false, element: element,
-                                      selectedRange: range, method: .accessibility)
-            }
-            // 无选区 → 改整个输入框
-            if let value = axValue(element),
-               !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                recordCapture(outcome: "success", method: .accessibility, characterCount: value.count)
-                return RewriteCapture(text: value, isWholeField: true, element: element,
-                                      selectedRange: nil, method: .accessibility)
-            }
+            context.element = element
+            context.selectedText = axSelectedText(element)
+            context.selectedRange = axSelectedRange(element)
+            context.value = axValue(element)
+            let role = axString(element, kAXRoleAttribute)
+            let subrole = axString(element, kAXSubroleAttribute)
+            context.isProtected = subrole == kAXSecureTextFieldSubrole
+            context.isEditable = canSelectWholeField(role: role, subrole: subrole)
         }
-        // AX 拿不到 → 兜底复制（按选区处理）
-        if let copied = await copyViaPasteboard(),
-           !copied.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            recordCapture(outcome: "success", method: .clipboardFallback, characterCount: copied.count)
-            return RewriteCapture(text: copied, isWholeField: false, element: nil,
-                                  selectedRange: nil, method: .clipboardFallback)
+        let capture = await captureForRewrite(context: context) { selectAll in
+            await copyViaPasteboard(selectAll: selectAll, element: context.element)
         }
-        recordCapture(outcome: "failure", method: nil, characterCount: nil)
-        return nil
+        recordCapture(outcome: capture == nil ? "failure" : "success",
+                      method: capture?.method, characterCount: capture?.text.count)
+        return capture
+    }
+
+    @MainActor
+    static func captureForRewrite(context: RewriteCaptureContext,
+                                  copy: (Bool) async -> String?) async -> RewriteCapture? {
+        guard !context.isProtected, !Task.isCancelled else { return nil }
+        func capture(_ text: String?, wholeField: Bool, method: CaptureMethod) -> RewriteCapture? {
+            guard let text, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+            return RewriteCapture(text: text, isWholeField: wholeField, element: context.element,
+                                  selectedRange: wholeField ? nil : context.selectedRange, method: method)
+        }
+        if (context.selectedRange?.length ?? 1) > 0,
+           let selected = capture(context.selectedText, wholeField: false, method: .accessibility) {
+            return selected
+        }
+        // A known selection must never silently expand to the entire editor.
+        if let range = context.selectedRange, range.length > 0 {
+            return capture(await copy(false), wholeField: false, method: .clipboardFallback)
+        }
+        if let whole = capture(context.value, wholeField: true, method: .accessibility) {
+            return whole
+        }
+        // Unknown AX selection information can still hide a user-selected range.
+        if context.selectedRange == nil,
+           let selected = capture(await copy(false), wholeField: false, method: .clipboardFallback) {
+            return selected
+        }
+        guard context.isEditable, !Task.isCancelled else { return nil }
+        return capture(await copy(true), wholeField: true, method: .clipboardFallback)
+    }
+
+    static func canSelectWholeField(role: String?, subrole: String?) -> Bool {
+        guard subrole != kAXSecureTextFieldSubrole else { return false }
+        return role == kAXTextFieldRole || role == kAXTextAreaRole || role == kAXComboBoxRole
+    }
+
+    static func axString(_ element: AXUIElement, _ attribute: String) -> String? {
+        var value: AnyObject?
+        guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success else { return nil }
+        return value as? String
     }
 
     // MARK: - AX helpers
@@ -116,24 +163,55 @@ enum SelectionCapture {
     // MARK: - 模拟复制兜底
 
     @MainActor
-    static func copyViaPasteboard() async -> String? {
-        let pb = NSPasteboard.general
-        let saved = PasteboardHelper.snapshot()
-        let beforeCount = pb.changeCount
-
-        Keyboard.press(Keyboard.cKey, command: true)
-
-        var result: String?
-        // 最多等 ~400ms 让目标 app 写入剪贴板
-        for _ in 0..<20 {
-            try? await Task.sleep(nanoseconds: 20_000_000)
-            if pb.changeCount != beforeCount {
-                result = pb.string(forType: .string)
-                break
-            }
+    static func copyViaPasteboard(selectAll: Bool = false, element: AXUIElement? = nil) async -> String? {
+        let originalRange = element.flatMap { axSelectedRange($0) }
+        let originalPID = NSWorkspace.shared.frontmostApplication?.processIdentifier
+        let hasFocus = {
+            guard NSWorkspace.shared.frontmostApplication?.processIdentifier == originalPID else { return false }
+            guard let element else { return true }
+            guard let focused = focusedElement() else { return false }
+            return CFEqual(element, focused)
         }
-        PasteboardHelper.restore(saved)
-        return result
+        let operations = ClipboardCaptureOperations(
+            press: { Keyboard.press($0, command: true) },
+            hasFocus: hasFocus,
+            restoreSelection: {
+                guard hasFocus() else { return }
+                if let element, var range = originalRange,
+                   let value = AXValueCreate(.cfRange, &range),
+                   AXUIElementSetAttributeValue(element, kAXSelectedTextRangeAttribute as CFString, value) == .success {
+                    return
+                }
+                // Some web editors do not expose a restorable AX range.
+                Keyboard.press(Keyboard.rightArrowKey)
+            })
+        return await copyViaPasteboard(selectAll: selectAll, pasteboard: .general, operations: operations)
+    }
+
+    @MainActor
+    static func copyViaPasteboard(selectAll: Bool, pasteboard: NSPasteboard,
+                                  operations: ClipboardCaptureOperations) async -> String? {
+        let saved = PasteboardHelper.snapshot(from: pasteboard)
+        defer { PasteboardHelper.restore(saved, to: pasteboard) }
+        guard !Task.isCancelled, operations.hasFocus() else { return nil }
+        if selectAll {
+            guard operations.press(Keyboard.aKey) else { return nil }
+        }
+        defer { if selectAll { operations.restoreSelection() } }
+        do {
+            if selectAll { try await Task.sleep(for: .milliseconds(40)) }
+            guard !Task.isCancelled, operations.hasFocus() else { return nil }
+            let beforeCount = pasteboard.changeCount
+            guard operations.press(Keyboard.cKey) else { return nil }
+            for _ in 0..<20 {
+                try await Task.sleep(for: .milliseconds(20))
+                guard operations.hasFocus() else { return nil }
+                if pasteboard.changeCount != beforeCount {
+                    return pasteboard.string(forType: .string)
+                }
+            }
+        } catch { return nil }
+        return nil
     }
 
     private static func recordCapture(outcome: String, method: CaptureMethod?, characterCount: Int?) {

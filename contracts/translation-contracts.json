@@ -4,7 +4,10 @@
     {"text": "The quick brown fox jumps over the lazy dog and it was great.", "expected": "en"},
     {"text": "Это очень интересная книга о русской истории.", "expected": "ru"},
     {"text": "مرحبا كيف حالك اليوم؟", "expected": "ar"},
-    {"text": "आप कैसे हैं? मुझे हिंदी बहुत पसंद है।", "expected": "hi"}
+    {"text": "आप कैसे हैं? मुझे हिंदी बहुत पसंद है।", "expected": "hi"},
+    {"text": "Xin chào, tôi muốn đọc tài liệu kỹ thuật bằng tiếng Việt.", "expected": "vi"},
+    {"text": "Xin chào, tôi muốn đọc tài liệu kỹ thuật bằng tiếng Việt.", "expected": "vi"},
+    {"text": "XIN CHÀO, TÔI MUỐN ĐỌC TÀI LIỆU KỸ THUẬT BẰNG TIẾNG VIỆT.", "expected": "vi"}
   ],
   "directionCases": [
     {"text": "你好，今天怎么样？", "mode": "auto", "isWrite": false, "native": "zh", "foreign": "en", "source": "zh", "target": "en"},
@@ -12,7 +15,10 @@
     {"text": "12345 !!!", "mode": "auto", "isWrite": false, "native": "zh", "foreign": "en", "source": null, "target": "zh"},
     {"text": "12345 !!!", "mode": "auto", "isWrite": true, "native": "zh", "foreign": "en", "source": null, "target": "en"},
     {"text": "任意文本", "mode": "nativeToForeign", "isWrite": false, "native": "zh", "foreign": "fr", "source": "zh", "target": "fr"},
-    {"text": "anything", "mode": "foreignToNative", "isWrite": true, "native": "zh", "foreign": "es", "source": "es", "target": "zh"}
+    {"text": "anything", "mode": "foreignToNative", "isWrite": true, "native": "zh", "foreign": "es", "source": "es", "target": "zh"},
+    {"text": "The quick brown fox jumps over the lazy dog.", "mode": "auto", "isWrite": false, "native": "vi", "foreign": "en", "source": "en", "target": "vi"},
+    {"text": "Xin chào, tôi muốn đọc tài liệu kỹ thuật bằng tiếng Việt.", "mode": "auto", "isWrite": true, "native": "vi", "foreign": "en", "source": "vi", "target": "en"},
+    {"text": "Xin chào, tôi muốn đọc tài liệu kỹ thuật bằng tiếng Việt.", "mode": "foreignToNative", "isWrite": false, "native": "en", "foreign": "vi", "source": "vi", "target": "en"}
   ],
   "lineAssembly": {
     "fragments": ["\ufeffdata: {\"choices\":[{\"del", "ta\":{\"content\":\"你\"}}]}\r\n", "data: {\"choices\":[{\"delta\":{\"content\":\"好\"}}]}\n", "data: [DONE]"],
@@ -45,6 +51,16 @@
       "target": "es",
       "style": "polished",
       "required": ["from English into Spanish", "Improve clarity and flow"],
+      "forbidden": []
+    },
+    {
+      "source": "en",
+      "target": "vi",
+      "style": "faithful",
+      "required": [
+        "from English into Vietnamese",
+        "Output ONLY the translation"
+      ],
       "forbidden": []
     }
   ]

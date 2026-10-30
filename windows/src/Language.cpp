@@ -18,6 +18,7 @@ const char* Code(Language l) {
     case Language::Russian: return "ru";
     case Language::Portuguese: return "pt";
     case Language::Indonesian: return "id";
+    case Language::Vietnamese: return "vi";
     }
     return "en";
 }
@@ -40,6 +41,7 @@ const wchar_t* DisplayName(Language l) {
     case Language::Russian: return L"Русский (Russian)";
     case Language::Portuguese: return L"Português (Portuguese)";
     case Language::Indonesian: return L"Bahasa Indonesia (Indonesian)";
+    case Language::Vietnamese: return L"Tiếng Việt (Vietnamese)";
     }
     return L"English";
 }
@@ -62,6 +64,7 @@ const char* PromptName(Language l) {
     case Language::Russian: return "Russian";
     case Language::Portuguese: return "Portuguese";
     case Language::Indonesian: return "Indonesian";
+    case Language::Vietnamese: return "Vietnamese";
     }
     return "English";
 }
@@ -78,7 +81,16 @@ std::wstring trim(const std::wstring& value) {
 
 std::wstring toLower(std::wstring value) {
     std::transform(value.begin(), value.end(), value.begin(),
-                   [](wchar_t c) { return static_cast<wchar_t>(std::towlower(c)); });
+                   [](wchar_t c) {
+                       // The default C locale does not fold Vietnamese uppercase letters.
+                       if ((c >= 0x1EA0 && c <= 0x1EF8 && c % 2 == 0) ||
+                           c == 0x0102 || c == 0x0110 || c == 0x0128 || c == 0x0168 || c == 0x01A0)
+                           return static_cast<wchar_t>(c + 1);
+                       if (c == 0x01AF) return static_cast<wchar_t>(0x01B0);
+                       if (c >= 0x00C0 && c <= 0x00DE && c != 0x00D7)
+                           return static_cast<wchar_t>(c + 0x20);
+                       return static_cast<wchar_t>(std::towlower(c));
+                   });
     return value;
 }
 
@@ -95,6 +107,9 @@ const std::map<Language, std::vector<std::wstring>>& latinStopwords() {
                                 L"com", L"não", L"uma", L"os", L"no", L"se", L"na", L"por", L"mais", L"as"}},
         {Language::Indonesian, {L"yang", L"dan", L"di", L"itu", L"dengan", L"untuk", L"tidak", L"ini", L"dari", L"dalam",
                                 L"akan", L"pada", L"juga", L"saya", L"ke", L"karena", L"tersebut", L"bisa", L"ada", L"mereka"}},
+        {Language::Vietnamese, {L"tôi", L"bạn", L"là", L"và", L"của", L"có", L"không", L"một", L"cho", L"với",
+                               L"này", L"những", L"được", L"trong", L"để", L"khi", L"chúng", L"từ", L"các", L"việc",
+                               L"xin", L"chào", L"toi", L"khong", L"nhung", L"duoc", L"chung", L"cac", L"viec", L"cua", L"chao"}},
     };
     return map;
 }
@@ -123,7 +138,8 @@ std::optional<Language> Detect(const std::wstring& text) {
         else if (cp >= 0x0980 && cp <= 0x09FF) { ++bengali; ++letters; }
         else if (cp >= 0x0400 && cp <= 0x04FF) { ++cyrillic; ++letters; }
         else if ((cp >= 'A' && cp <= 'Z') || (cp >= 'a' && cp <= 'z') ||
-                 (cp >= 0x00C0 && cp <= 0x024F)) { ++latin; ++letters; }
+                 (cp >= 0x00C0 && cp <= 0x024F) ||
+                 (cp >= 0x1E00 && cp <= 0x1EFF)) { ++latin; ++letters; }
     }
     if (letters == 0) return std::nullopt;
 
@@ -141,8 +157,14 @@ std::optional<Language> Detect(const std::wstring& text) {
     std::wstring lower = toLower(t);
     std::vector<std::wstring> words;
     std::wstring cur;
+    bool vietnameseMarks = false;
     for (wchar_t c : lower) {
-        bool isWordChar = (c >= 'a' && c <= 'z') || (c >= 0x00C0 && c <= 0x024F) || c == '\'';
+        if ((c >= 0x1EA0 && c <= 0x1EF9) || c == 0x0111 || c == 0x01A1 || c == 0x01B0 ||
+            c == 0x0309 || c == 0x0323) vietnameseMarks = true;
+        // Preserve decomposed words instead of splitting at each combining accent.
+        if (c >= 0x0300 && c <= 0x036F) continue;
+        bool isWordChar = (c >= 'a' && c <= 'z') || (c >= 0x00C0 && c <= 0x024F) ||
+                          (c >= 0x1E00 && c <= 0x1EFF) || c == '\'';
         if (isWordChar) cur += c;
         else if (!cur.empty()) { words.push_back(cur); cur.clear(); }
     }
@@ -152,7 +174,7 @@ std::optional<Language> Detect(const std::wstring& text) {
     Language best = Language::English;
     int bestScore = 0, secondScore = 0;
     for (auto& [langKey, stops] : latinStopwords()) {
-        int score = 0;
+        int score = langKey == Language::Vietnamese && vietnameseMarks ? 1 : 0;
         for (auto& w : words)
             if (std::find(stops.begin(), stops.end(), w) != stops.end()) ++score;
         if (score > bestScore) { secondScore = bestScore; bestScore = score; best = langKey; }

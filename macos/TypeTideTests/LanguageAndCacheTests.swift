@@ -2,6 +2,21 @@ import XCTest
 @testable import TypeTide
 
 final class LanguageAndCacheTests: XCTestCase {
+    func testVietnameseCanBeSelectedAndDetected() throws {
+        let vietnamese = try XCTUnwrap(Language(rawValue: "vi"))
+        XCTAssertTrue(Language.allCases.contains(vietnamese))
+        XCTAssertEqual(vietnamese.displayName, "Tiếng Việt (Vietnamese)")
+        XCTAssertEqual(vietnamese.promptName, "Vietnamese")
+        let text = "Xin chào, tôi muốn đọc tài liệu kỹ thuật bằng tiếng Việt."
+        XCTAssertEqual(Language.detect(in: text), vietnamese)
+        XCTAssertEqual(Language.detect(in: text.decomposedStringWithCanonicalMapping), vietnamese)
+        let route = TranslationRouting.resolve(text: "The quick brown fox jumps over the lazy dog.",
+            mode: .auto, isWrite: false, native: vietnamese, foreign: .english)
+        XCTAssertEqual(route, TranslationRoute(source: .english, target: vietnamese))
+        let prompt = try LocalTranslationPrompt.make(.init(text: "Hello", source: .english, target: vietnamese))
+        XCTAssertTrue(prompt.contains("English (en) to Vietnamese (vi) translator"))
+    }
+
     @MainActor
     func testTideStateTracksStreamingLifecycle() {
         let model = TranslationPopupModel(original: "你好", target: .english)

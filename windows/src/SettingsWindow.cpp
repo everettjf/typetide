@@ -573,7 +573,7 @@ void buildPages() {
         makeLabel(L"STARTUP", x, y + 62, w, -1, true),
         make(L"BUTTON", L"Launch at login", WS_TABSTOP | BS_AUTOCHECKBOX, x, y + 88, 180, 22, kLogin),
         makeLabel(L"UPDATES", x, y + 150, w, -1, true),
-        makeLabel(L"Version " TYPETIDE_VERSION_STRING, x, y + 178, 200, kVersionLabel),
+        makeLabel(L"Version " TYPETIDE_VERSION_STRING L" (build " TYPETIDE_BUILD_STRING L")", x, y + 178, 300, kVersionLabel),
         make(L"BUTTON", L"Check for updates", WS_TABSTOP | BS_PUSHBUTTON, x, y + 206, 150, 32, kCheckUpdate),
         makeLabel(L"", x, y + 258, w, kFirstRunHint),
     };
@@ -757,7 +757,7 @@ void buildPages() {
     y = 82;
     {
     std::vector<HWND> controls = {
-        makeLabel(L"TypeTide " TYPETIDE_VERSION_STRING, x, y, 300, kAboutTitle, true),
+        makeLabel(L"TypeTide " TYPETIDE_VERSION_STRING L" (build " TYPETIDE_BUILD_STRING L")", x, y, 300, kAboutTitle, true),
         makeLabel(L"System-wide AI translation && inline rewrite for Windows.\n"
                   L"Private local models or secure OpenAI-compatible cloud APIs.",
                   x, y + 28, w, kAboutDesc),

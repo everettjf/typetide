@@ -54,12 +54,20 @@ int runBuiltInSelfTest() {
     }
     for (const TranslationRequest& request : {
         TranslationRequest{L"你好世界，今天天气很好。", Language::Chinese, Language::English, RewriteStyle::Faithful},
-        TranslationRequest{L"Please save the document before closing the window.", Language::English, Language::Chinese, RewriteStyle::Faithful}
+        TranslationRequest{L"Please save the document before closing the window.", Language::English, Language::Chinese, RewriteStyle::Faithful},
+        TranslationRequest{L"Please save the document before closing the window.", Language::English, Language::Vietnamese, RewriteStyle::Faithful},
+        TranslationRequest{L"Vui lòng lưu tài liệu trước khi đóng cửa sổ.", Language::Vietnamese, Language::English, RewriteStyle::Faithful}
     }) {
         std::wstring full;
         if (!builtin::Stream(request, 1, [](uint64_t, const std::wstring&) {}, cancel, &full, &error) ||
             util::Trim(full).empty()) {
             printf("Built-in translation failed: %s\n", util::Narrow(error).c_str());
+            builtin::Shutdown();
+            return 1;
+        }
+        if ((request.target == Language::Vietnamese && lang::Detect(full) != Language::Vietnamese) ||
+            (request.source == Language::Vietnamese && util::ToLower(full).find(L"save") == std::wstring::npos)) {
+            printf("Vietnamese offline translation did not match the expected language/meaning: %s\n", util::Narrow(full).c_str());
             builtin::Shutdown();
             return 1;
         }

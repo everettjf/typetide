@@ -71,3 +71,6 @@ jobs:
             -derivedDataPath "$RUNNER_TEMP/TypeTideDerivedData" \
             CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY= analyze
         working-directory: macos
+
+      - name: Check macOS 26 runtime imports
+        run: ./macos/scripts/check-runtime-compatibility.sh "$RUNNER_TEMP/TypeTideDerivedData/Build/Products/Debug/TypeTide.app"

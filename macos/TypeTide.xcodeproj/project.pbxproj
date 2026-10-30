@@ -164,6 +164,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				8B0000030000000000000001 /* mlx-swift-lm */,
+				8B0000030000000000000002 /* swift-collections */,
 				5A86A34D2E9415F300CA8E22 /* XCRemoteSwiftPackageReference "ollama-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -336,7 +337,7 @@
 				CODE_SIGN_ENTITLEMENTS = TypeTide/TypeTide.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = YPV49M8592;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -383,7 +384,7 @@
 				CODE_SIGN_ENTITLEMENTS = TypeTide/TypeTide.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = YPV49M8592;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -461,6 +462,8 @@
 			};
 		};
 		8B0000030000000000000001 /* mlx-swift-lm */ = {isa = XCRemoteSwiftPackageReference; repositoryURL = "https://github.com/ml-explore/mlx-swift-lm"; requirement = {kind = exactVersion; version = 2.30.6; }; };
+		/* 1.7 emits Swift 6.4 Borrow imports unavailable on macOS 26 (#11). */
+		8B0000030000000000000002 /* swift-collections */ = {isa = XCRemoteSwiftPackageReference; repositoryURL = "https://github.com/apple/swift-collections.git"; requirement = {kind = exactVersion; version = 1.6.0; }; };
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */

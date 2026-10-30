@@ -38,6 +38,7 @@ add_executable(TypeTide WIN32
 target_compile_definitions(TypeTide PRIVATE
     UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN
     TYPETIDE_VERSION_STRING="${PROJECT_VERSION}"
+    TYPETIDE_BUILD_STRING="2"
     TYPETIDE_CONTRACTS_PATH="${CMAKE_SOURCE_DIR}/../contracts/translation-contracts.json"
 )
 

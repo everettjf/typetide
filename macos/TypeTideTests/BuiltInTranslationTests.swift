@@ -64,6 +64,33 @@ final class BuiltInTranslationTests: XCTestCase {
         XCTAssertEqual(AppSettings.backend, .openai)
     }
 
+    func testLiveVietnameseOfflineTranslationWithInstalledModel() async throws {
+        let directory = BuiltInModel.directory
+        guard BuiltInModel.isInstalled(at: directory) else {
+            throw XCTSkip("Install the built-in model to exercise Vietnamese offline inference; this test never downloads it.")
+        }
+        let engine = LocalTranslationEngine()
+        for request in [
+            TranslationRequest(text: "Please save the document before closing the window.", source: .english, target: .vietnamese),
+            TranslationRequest(text: "Vui lòng lưu tài liệu trước khi đóng cửa sổ.", source: .vietnamese, target: .english)
+        ] {
+            let stream = AsyncThrowingStream<String, Error> { continuation in
+                Task {
+                    do {
+                        try await engine.translate(request, continuation: continuation, directory: directory)
+                        continuation.finish()
+                    } catch { continuation.finish(throwing: error) }
+                }
+            }
+            var result = ""
+            for try await chunk in stream { result += chunk }
+            XCTAssertEqual(Language.detect(in: result), request.target)
+            if request.target == .vietnamese { XCTAssertTrue(result.lowercased().contains("lưu")) }
+            else { XCTAssertTrue(result.lowercased().contains("save")) }
+            print("LIVE_VI_OFFLINE_TRANSLATION=\(result)")
+        }
+    }
+
     /// Explicit opt-in because this downloads 2.22 GB. Inference loads only the local directory.
     func testLiveModelDownloadAndOfflineTranslation() async throws {
         guard ProcessInfo.processInfo.environment["TYPETIDE_RUN_LOCAL_MODEL_TEST"] == "1" else {

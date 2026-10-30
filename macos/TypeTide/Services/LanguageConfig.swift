@@ -9,7 +9,7 @@ import Foundation
 import NaturalLanguage
 
 /// 通用语言类型（用于检测和目标翻译）
-/// 世界上使用人数最多的10种语言
+/// Keep the picker, detection and prompt names aligned on both platforms.
 enum Language: String, CaseIterable, Identifiable {
     case english = "en"
     case chinese = "zh"
@@ -21,6 +21,7 @@ enum Language: String, CaseIterable, Identifiable {
     case russian = "ru"
     case portuguese = "pt"
     case indonesian = "id"
+    case vietnamese = "vi"
 
     var id: String { rawValue }
 
@@ -37,6 +38,7 @@ enum Language: String, CaseIterable, Identifiable {
         case .russian: return "Русский (Russian)"
         case .portuguese: return "Português (Portuguese)"
         case .indonesian: return "Bahasa Indonesia (Indonesian)"
+        case .vietnamese: return "Tiếng Việt (Vietnamese)"
         }
     }
 
@@ -57,6 +59,7 @@ enum Language: String, CaseIterable, Identifiable {
         case .russian: return "Russian"
         case .portuguese: return "Portuguese"
         case .indonesian: return "Indonesian"
+        case .vietnamese: return "Vietnamese"
         }
     }
 
@@ -70,7 +73,7 @@ enum Language: String, CaseIterable, Identifiable {
         """
     }
 
-    /// 用 NaturalLanguage 检测文本的主语言，映射到我们支持的 10 种之一。
+    /// 用 NaturalLanguage 检测文本的主语言，映射到支持的语言之一。
     /// 文本为空、无法判断、或不在支持集合内时返回 nil（交由调用方走兜底方向）。
     static func detect(in text: String) -> Language? {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -91,6 +94,7 @@ enum Language: String, CaseIterable, Identifiable {
         case .russian: return .russian
         case .portuguese: return .portuguese
         case .indonesian: return .indonesian
+        case .vietnamese: return .vietnamese
         default: return nil
         }
     }

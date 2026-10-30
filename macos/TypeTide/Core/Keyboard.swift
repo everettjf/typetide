@@ -11,6 +11,7 @@ enum Keyboard {
     static let aKey: CGKeyCode = 0
     static let cKey: CGKeyCode = 8
     static let vKey: CGKeyCode = 9
+    static let rightArrowKey: CGKeyCode = 124
 
     /// 发送一次按键，可带 ⌘ 修饰。
     @discardableResult

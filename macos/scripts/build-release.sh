@@ -116,6 +116,10 @@ xcodebuild archive \
 
 success "Archive created at $ARCHIVE_PATH"
 
+# Refuse a notarized release that cannot load on the declared macOS baseline.
+"$PROJECT_ROOT/scripts/check-runtime-compatibility.sh" \
+    "$ARCHIVE_PATH/Products/Applications/TypeTide.app"
+
 # 步骤 3: 导出 App
 info "Step 3/6: Exporting application..."
 

@@ -1,5 +1,5 @@
 {
-  "originHash" : "bb4180fb577de2c9ffab736db8e73dde30bd87e13fd0a2cd26f085d41f79560e",
+  "originHash" : "adff8edd7e5662a49d47eb01aaf48c6a5a12e6fde5899d8abcb44da52b849197",
   "pins" : [
     {
       "identity" : "mlx-swift",
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections.git",
       "state" : {
-        "revision" : "a66de878e87ef5a3d5d390e0f6d9002aa5541a43",
-        "version" : "1.7.0"
+        "revision" : "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+        "version" : "1.6.0"
       }
     },
     {

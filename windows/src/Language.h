@@ -17,6 +17,7 @@ enum class Language {
     Russian,
     Portuguese,
     Indonesian,
+    Vietnamese,
 };
 
 /// 翻译方向模式（读 / 写 各自独立配置）
@@ -44,7 +45,7 @@ namespace lang {
 inline constexpr Language All[] = {
     Language::English, Language::Chinese, Language::Hindi, Language::Spanish,
     Language::French, Language::Arabic, Language::Bengali, Language::Russian,
-    Language::Portuguese, Language::Indonesian,
+    Language::Portuguese, Language::Indonesian, Language::Vietnamese,
 };
 
 /// 序列化用短代码（"en"…），与 macOS 侧一致
