@@ -48,6 +48,8 @@ jobs:
   macos26:
     name: Launch notarized release binary on macOS 26
     runs-on: macos-26
+    permissions:
+      contents: write # GitHub requires write access to read an unpublished draft release.
     env:
       GH_TOKEN: ${{ github.token }}
       CANDIDATE_TAG: ${{ inputs.candidate_tag }}
