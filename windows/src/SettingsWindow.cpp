@@ -628,6 +628,7 @@ void buildPages() {
                         : s.backend == TranslationBackend::Ollama ? kBackendOllama : kBackendOpenAI, BST_CHECKED);
     SetWindowTextW(ctrl(kOllamaModel), util::Widen(s.ollamaModel).c_str());
     SetWindowTextW(ctrl(kOaiUrl), util::Widen(s.openAIBaseURL).c_str());
+    Settings::shared().ensureCloudKeyLoaded();
     SetWindowTextW(ctrl(kOaiKey), util::Widen(s.openAIKey).c_str());
     SetWindowTextW(ctrl(kOaiModel), util::Widen(s.openAIModel).c_str());
     {

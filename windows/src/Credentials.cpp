@@ -8,17 +8,18 @@ constexpr wchar_t kTarget[] = L"TypeTide/OpenAICompatibleApiKey";
 
 namespace credentials {
 
-std::string LoadCloudApiKey() {
+LoadResult LoadCloudApiKey(std::string* key) {
+    key->clear();
     PCREDENTIALW credential = nullptr;
-    if (!CredReadW(kTarget, CRED_TYPE_GENERIC, 0, &credential)) return {};
+    if (!CredReadW(kTarget, CRED_TYPE_GENERIC, 0, &credential))
+        return GetLastError() == ERROR_NOT_FOUND ? LoadResult::NotFound : LoadResult::Error;
 
-    std::string key;
     if (credential->CredentialBlob && credential->CredentialBlobSize) {
         const char* bytes = reinterpret_cast<const char*>(credential->CredentialBlob);
-        key.assign(bytes, bytes + credential->CredentialBlobSize);
+        key->assign(bytes, bytes + credential->CredentialBlobSize);
     }
     CredFree(credential);
-    return key;
+    return LoadResult::Found;
 }
 
 bool SaveCloudApiKey(const std::string& key) {

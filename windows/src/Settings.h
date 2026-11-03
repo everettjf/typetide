@@ -83,4 +83,20 @@ struct Settings {
     /// 原子保存；失败时保留旧文件并返回 false。
     bool save() const;
     static std::wstring filePath();
+
+    /// Re-read the API key if it could not be read at startup (e.g. Credential
+    /// Manager not ready right after logon / fast-startup resume). Main thread only.
+    void ensureCloudKeyLoaded();
+
+private:
+    bool readCloudKey();
+
+    // What Credential Manager currently holds, as far as we know. save() only
+    // touches the credential when openAIKey differs from it, so a failed read
+    // at startup can never turn into a delete.
+    mutable std::string persistedKey_;
+    mutable bool persistedKeyKnown_ = false;
+    // Non-secret marker in settings.json: a key was saved before. Lets us tell
+    // "user has no key" apart from "credential temporarily unreadable".
+    mutable bool hasCloudApiKey_ = false;
 };

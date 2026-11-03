@@ -139,7 +139,8 @@ struct BackendConfig {
     std::string openAIModel;
 
     static BackendConfig snapshot() {
-        const Settings& s = Settings::shared();
+        Settings& s = Settings::shared();
+        s.ensureCloudKeyLoaded();  // retry if the key was unreadable at startup
         return {s.backend, s.ollamaHost, s.ollamaPort, s.ollamaModel,
                 s.openAIBaseURL, s.openAIKey, s.openAIModel};
     }
