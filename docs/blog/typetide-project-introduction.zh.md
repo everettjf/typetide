@@ -141,7 +141,7 @@ macOS 和 Windows 使用完全相同的十一种检测与翻译语言：
 
 ## 三步开始使用
 
-1. **安装应用。** 从 [官方下载页](https://xnu.app/typetide/#top) 下载 macOS DMG、Windows 安装版 EXE 或便携版 ZIP。macOS 用户也可运行 `brew install --cask everettjf/tap/typetide`。
+1. **安装应用。** 从 [官方下载页](https://atomsprout.com/typetide/#top) 下载 macOS DMG、Windows 安装版 EXE 或便携版 ZIP。macOS 用户也可运行 `brew install --cask everettjf/tap/typetide`。
 2. **选择后端。** Apple Silicon Mac 使用默认的 **Built-in (Offline)**，下载约 2.22 GB 模型后即可离线使用，无需 Key 或 Ollama。下载显示速度与预计剩余时间，暂停或退出后可续传已保存分片；安装期间预留约 4.5 GB 空间。内置模型的 2K 输入 token 限制意味着长文本需要分段。Windows 默认内置 GGUF 后端，下载约 2.49 GB 模型后即可离线使用，无需另装 Ollama。Intel Mac 使用 Ollama 或自己的 API。
 3. **完成首次检查。** macOS 授予辅助功能权限，Windows 无需额外系统权限；然后在设置中测试后端并验证已配置的快捷键。选中文字按“读”，输入文字按“写”。
 
@@ -151,4 +151,4 @@ TypeTide 是一个 MIT 许可的开源项目。它不试图成为另一个需要
 
 项目地址：[github.com/everettjf/typetide](https://github.com/everettjf/typetide)
 
-产品主页：[xnu.app/typetide](https://xnu.app/typetide/)
+产品主页：[xnu.app/typetide](https://atomsprout.com/typetide/)

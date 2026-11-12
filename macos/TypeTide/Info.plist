@@ -27,7 +27,7 @@
 	<key>NSAccessibilityUsageDescription</key>
 	<string>TypeTide needs accessibility permission to read your selected text and replace it in place when you translate or rewrite.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string></string>
+	<string>Copyright © 2026 AtomSprout. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSServices</key>

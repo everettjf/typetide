@@ -763,7 +763,7 @@ void buildPages() {
                   x, y + 28, w, kAboutDesc),
         make(L"SysLink",
              L"<a href=\"https://github.com/everettjf/typetide\">GitHub</a>   ·   "
-             L"<a href=\"https://xnu.app/TypeTide/\">Website</a>   ·   "
+             L"<a href=\"https://atomsprout.com/typetide/\">Website</a>   ·   "
              L"<a href=\"https://discord.gg/eGzEaP6TzR\">Discord</a>",
              WS_TABSTOP, x, y + 84, w, 22, kAboutLinks),
     };

@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://xnu.app/typetide/">🌐 Website</a> ·
+  <a href="https://atomsprout.com/typetide/">🌐 Website</a> ·
   <a href="docs/blog/introducing-typetide.md">📝 Read the intro</a> ·
   <b>English</b> · <a href="README.zh-CN.md">简体中文</a>
 </p>
@@ -75,9 +75,9 @@ macOS — with [Homebrew](https://brew.sh) (recommended):
 ```bash
 brew install --cask everettjf/tap/typetide
 ```
-…or download the latest `.dmg` from [Downloads](https://xnu.app/typetide/#top), drag it to Applications, and launch it. The build is Developer ID signed and notarized by Apple.
+…or download the latest `.dmg` from [Downloads](https://atomsprout.com/typetide/#top), drag it to Applications, and launch it. The build is Developer ID signed and notarized by Apple.
 
-Windows — download and run the latest `TypeTide-Setup-x.y.z.exe` installer from [Downloads](https://xnu.app/typetide/#top) (per-user, no admin needed; a portable `TypeTide-Windows-x.y.z.zip` is also available). If SmartScreen warns about an unrecognized app, choose **More info → Run anyway**.
+Windows — download and run the latest `TypeTide-Setup-x.y.z.exe` installer from [Downloads](https://atomsprout.com/typetide/#top) (per-user, no admin needed; a portable `TypeTide-Windows-x.y.z.zip` is also available). If SmartScreen warns about an unrecognized app, choose **More info → Run anyway**.
 
 **2. Pick a backend**
 

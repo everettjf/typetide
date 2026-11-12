@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://xnu.app/typetide/">🌐 官网</a> ·
+  <a href="https://atomsprout.com/typetide/">🌐 官网</a> ·
   <a href="docs/blog/typetide-project-introduction.zh.md">📝 项目介绍</a> ·
   <a href="README.md">English</a> · <b>简体中文</b>
 </p>
@@ -75,9 +75,9 @@ macOS——推荐用 [Homebrew](https://brew.sh)：
 ```bash
 brew install --cask everettjf/tap/typetide
 ```
-……或者从 [官方下载页](https://xnu.app/typetide/#top) 下载最新 `.dmg`，拖进「应用程序」后启动。安装包使用 Developer ID 签名，并通过 Apple 公证。
+……或者从 [官方下载页](https://atomsprout.com/typetide/#top) 下载最新 `.dmg`，拖进「应用程序」后启动。安装包使用 Developer ID 签名，并通过 Apple 公证。
 
-Windows——从 [官方下载页](https://xnu.app/typetide/#top) 下载最新的 `TypeTide-Setup-x.y.z.exe` 安装包运行即可（按用户安装，无需管理员权限；也提供便携版 `TypeTide-Windows-x.y.z.zip`）。如果 SmartScreen 提示无法识别的应用，点**更多信息 → 仍要运行**。
+Windows——从 [官方下载页](https://atomsprout.com/typetide/#top) 下载最新的 `TypeTide-Setup-x.y.z.exe` 安装包运行即可（按用户安装，无需管理员权限；也提供便携版 `TypeTide-Windows-x.y.z.zip`）。如果 SmartScreen 提示无法识别的应用，点**更多信息 → 仍要运行**。
 
 **2. 选一个后端**
 

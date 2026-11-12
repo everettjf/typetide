@@ -82,7 +82,7 @@ Apple Silicon Mac 和 Windows 默认使用内置离线模型，Ollama 与 API �
 
 ## 六、三步上手
 
-1. **安装。** 从[官方下载页](https://xnu.app/typetide/#top)下载 macOS DMG、Windows 安装包或便携版。macOS 也可运行 `brew install --cask everettjf/tap/typetide`。
+1. **安装。** 从[官方下载页](https://atomsprout.com/typetide/#top)下载 macOS DMG、Windows 安装包或便携版。macOS 也可运行 `brew install --cask everettjf/tap/typetide`。
 2. **选后端。** Apple Silicon Mac 和 Windows 保留 **Built-in (Offline)** 并下载各自的模型；Intel Mac 使用 Ollama 或自己的 OpenAI 兼容接口。
 3. **授予辅助功能权限。** 在 **系统设置 → 隐私与安全性 → 辅助功能** 里允许 TypeTide（这是它能读取选区、替换文字的前提）。然后：选中文字 → <kbd>⌥</kbd><kbd>D</kbd>，或打字 → <kbd>⌥</kbd><kbd>R</kbd>。
 
@@ -98,4 +98,4 @@ Apple Silicon Mac 和 Windows 默认使用内置离线模型，Ollama 与 API �
 
 ---
 
-*TypeTide · 面向 macOS 26+ 的系统级 AI 翻译与就地改写。[官网](https://xnu.app/typetide/) · [GitHub](https://github.com/everettjf/typetide) · [English version](introducing-typetide.md)*
+*TypeTide · 面向 macOS 26+ 的系统级 AI 翻译与就地改写。[官网](https://atomsprout.com/typetide/) · [GitHub](https://github.com/everettjf/typetide) · [English version](introducing-typetide.md)*

@@ -64,7 +64,7 @@ Under the hood it's a focused, native Swift app: a `SelectionCapture` layer over
 
 ## Get started in three steps
 
-1. **Install.** Download the macOS DMG or Windows installer/portable ZIP from [Downloads](https://xnu.app/typetide/#top). macOS users can also run `brew install --cask everettjf/tap/typetide`.
+1. **Install.** Download the macOS DMG or Windows installer/portable ZIP from [Downloads](https://atomsprout.com/typetide/#top). macOS users can also run `brew install --cask everettjf/tap/typetide`.
 2. **Pick a backend.** On Apple Silicon Macs or Windows, keep **Built-in (Offline)** and download the platform-specific model once. Intel Macs use Ollama or an OpenAI-compatible API.
 3. **Complete setup.** On macOS, allow TypeTide under **System Settings → Privacy & Security → Accessibility** (it's what lets the app read selections and replace text). Then select text → <kbd>⌥</kbd><kbd>D</kbd>, or select your writing → <kbd>⌥</kbd><kbd>R</kbd>. Windows defaults to Alt+D for reading and Ctrl+Shift+R for replacement.
 
@@ -78,4 +78,4 @@ It's **open source (MIT)**. If it saves you a few context switches a day, a ⭐�
 
 ---
 
-*TypeTide · system-wide AI translation & inline rewrite for macOS 26+. [Website](https://xnu.app/typetide/) · [GitHub](https://github.com/everettjf/typetide) · [中文版](introducing-typetide.zh.md)*
+*TypeTide · system-wide AI translation & inline rewrite for macOS 26+. [Website](https://atomsprout.com/typetide/) · [GitHub](https://github.com/everettjf/typetide) · [中文版](introducing-typetide.zh.md)*
