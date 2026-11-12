@@ -40,22 +40,67 @@ std::wstring Settings::filePath() {
     return util::AppDataDir() + L"\\settings.json";
 }
 
+namespace {
+bool IsolatedTest() {
+    wchar_t testDir[2]{};
+    return GetEnvironmentVariableW(L"TYPETIDE_DATA_DIR", testDir, 2) != 0;
+}
+} // namespace
+
+bool Settings::readCloudKey() {
+    std::string key;
+    switch (credentials::LoadCloudApiKey(&key)) {
+    case credentials::LoadResult::Found:
+        openAIKey = key;
+        persistedKey_ = key;
+        persistedKeyKnown_ = true;
+        hasCloudApiKey_ = !key.empty();
+        return true;
+    case credentials::LoadResult::NotFound:
+        if (hasCloudApiKey_) {
+            // A key was saved before, so "not found" right now is most likely
+            // a vault that is not ready yet. Keep the state unknown and retry.
+            util::Log("settings: saved API key not found yet, will retry");
+            return false;
+        }
+        openAIKey.clear();
+        persistedKey_.clear();
+        persistedKeyKnown_ = true;
+        return true;
+    default:
+        util::Log("settings: credential read failed (%lu), will retry", GetLastError());
+        return false;
+    }
+}
+
+void Settings::ensureCloudKeyLoaded() {
+    if (persistedKeyKnown_ || IsolatedTest()) return;
+    if (!openAIKey.empty()) return;  // user typed a key meanwhile; save() will store it
+    readCloudKey();
+}
+
 void Settings::load() {
+    // Even when settings.json is missing or broken, still pick up the key so a
+    // later save() starts from what Credential Manager really holds.
+    auto loadKeyOnly = [this] { if (!IsolatedTest()) readCloudKey(); };
     std::ifstream f(filePath(), std::ios::binary);
-    if (!f) return;
+    if (!f) { loadKeyOnly(); return; }
     f.seekg(0, std::ios::end);
     const auto length = f.tellg();
     if (length < 0 || length > 1024 * 1024) {
         util::Log("settings: refusing invalid file size");
+        loadKeyOnly();
         return;
     }
     f.seekg(0, std::ios::beg);
     std::stringstream ss;
     ss << f.rdbuf();
+    f.close();  // release the file so a save() below can replace it
     bool ok = false;
     json::Value root = json::Parse(ss.str(), &ok);
     if (!ok || !root.isObject()) {
         util::Log("settings: invalid JSON, using safe defaults");
+        loadKeyOnly();
         return;
     }
 
@@ -81,16 +126,14 @@ void Settings::load() {
     openAIBaseURL = str("openAIBaseURL", openAIBaseURL);
     if (openAIBaseURL.size() > 2048) openAIBaseURL = "https://api.openai.com/v1";
     const std::string legacyKey = str("openAIKey", "");
-    wchar_t testDir[2]{};
-    const bool isolatedTest = GetEnvironmentVariableW(L"TYPETIDE_DATA_DIR", testDir, 2) != 0;
+    hasCloudApiKey_ = boolean("hasCloudApiKey", false);
     bool migratedLegacyKey = false;
-    if (isolatedTest) {
+    if (IsolatedTest()) {
         openAIKey = legacyKey;
     } else {
-        openAIKey = credentials::LoadCloudApiKey();
+        readCloudKey();
         if (openAIKey.empty() && !legacyKey.empty()) {
-            openAIKey = legacyKey;
-            credentials::SaveCloudApiKey(openAIKey); // migrate old plaintext settings
+            openAIKey = legacyKey;  // migrate old plaintext settings; save() stores it
             migratedLegacyKey = true;
         }
     }
@@ -165,13 +208,23 @@ bool Settings::save() const {
     root["ollamaModel"] = ollamaModel;
 
     root["openAIBaseURL"] = openAIBaseURL;
-    wchar_t testDir[2]{};
-    const bool isolatedTest = GetEnvironmentVariableW(L"TYPETIDE_DATA_DIR", testDir, 2) != 0;
-    if (isolatedTest) root["openAIKey"] = openAIKey;
-    else if (!credentials::SaveCloudApiKey(openAIKey)) {
-        util::Log("settings: credential save failed (%lu)", GetLastError());
-        return false;
+    if (IsolatedTest()) {
+        root["openAIKey"] = openAIKey;
+    } else if (persistedKeyKnown_ || !openAIKey.empty()) {
+        // Only write when the key actually changed. If the credential could not
+        // be read (state unknown) and no new key was entered, leave it alone:
+        // writing "" here used to delete the saved key after every reboot.
+        if (!persistedKeyKnown_ || openAIKey != persistedKey_) {
+            if (!credentials::SaveCloudApiKey(openAIKey)) {
+                util::Log("settings: credential save failed (%lu)", GetLastError());
+                return false;
+            }
+            persistedKey_ = openAIKey;
+            persistedKeyKnown_ = true;
+            hasCloudApiKey_ = !openAIKey.empty();
+        }
     }
+    root["hasCloudApiKey"] = hasCloudApiKey_;
     root["openAIModel"] = openAIModel;
 
     root["nativeLanguage"] = lang::Code(nativeLanguage);
