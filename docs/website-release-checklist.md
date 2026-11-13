@@ -15,8 +15,8 @@ Before updating `docs/index.html`:
    packages include a CPU inference runtime and use GGUF weights (about 2.49 GB).
    Intel Macs use Ollama or an API. Keep optional Ollama/API choices visible.
    Describe documented compatibility issues next to the affected download.
-5. Keep English and Chinese READMEs, introduction pages, and the xnu.app catalog
-   aligned. Use the lowercase canonical URL `https://xnu.app/typetide/`.
+5. Keep English and Chinese READMEs, introduction pages, and the AtomSprout catalog
+   aligned. Use the lowercase canonical URL `https://atomsprout.com/typetide/`.
 6. Check desktop and narrow layouts, local image paths, download-link targets,
    and the live page after GitHub Pages reports a successful deployment.
 

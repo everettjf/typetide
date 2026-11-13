@@ -151,4 +151,4 @@ TypeTide 是一个 MIT 许可的开源项目。它不试图成为另一个需要
 
 项目地址：[github.com/everettjf/typetide](https://github.com/everettjf/typetide)
 
-产品主页：[xnu.app/typetide](https://atomsprout.com/typetide/)
+产品主页：[atomsprout.com/typetide](https://atomsprout.com/typetide/)
